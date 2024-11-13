@@ -1,0 +1,80 @@
+.editcontainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+    background-color: whitesmoke;
+  }
+  
+  .editform_area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #ffddf17a;
+    height: auto;
+    width: auto;
+    border: 1px solid #cbcbcb;
+    border-radius: 20px;
+    box-shadow: 3px 4px 0px 1px #99015f8b;
+    width: 50%;
+    margin: 30px;
+  }
+  
+  .edittitle {
+    color: #264143;
+    font-weight: 750;
+    font-size: 1.5em;
+    margin-top: 20px;
+  }
+  
+  .editsub_title {
+    font-weight: 600;
+    margin: 5px 0;
+  }
+  
+  .editform_group {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin: 10px;
+  }
+  
+  .editform_style {
+    outline: none;
+    border: 2px solid #26414338;
+    box-shadow: 2px 3px 0px 1px #99015f8b;
+    width: 390px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  
+  .editform_style:focus, .editbtn:focus {
+    transform: translateY(4px);
+    box-shadow: 1px 2px 0px 0px #E99F4C;
+  }
+  
+  .editbtn {
+    padding: 15px;
+    margin: 25px 0px;
+    width: 200px;
+    font-size: 18px;
+    background: #96064e;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    box-shadow: 3px 3px 0px 0px #3d0122;
+  }
+  
+  .editbtn:hover {
+    opacity: .9;
+  }
+  
+  .editlink {
+    font-weight: 800;
+    color: #264143;
+    padding: 5px;
+  }

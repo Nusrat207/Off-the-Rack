@@ -1,0 +1,99 @@
+.addcontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    margin: 70px;
+    height: 990px;
+    
+}
+
+.addimg-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.addform-container {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+    
+}
+
+
+
+  .addform_area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    height: auto;
+    width: auto;
+    border: none;
+    border-radius: 20px;
+  /*  box-shadow: 3px 4px 0px 1px #99015f8b; */
+    width: 600px;
+    margin: 30px;
+  }
+  
+  .addtitle {
+    color: #264143;
+    font-weight: 750;
+    font-size: 1.5em;
+    margin-top: 20px;
+  }
+  
+  .addsub_title {
+    font-weight: 600;
+    margin: 5px 0;
+  }
+  
+  .addform_group {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin: 10px;
+  }
+  
+  .addform_style {
+    outline: none;
+    border: 1px solid #26414338;
+    box-shadow: 1px 2px 0px 1px #7d7d7d8b;
+    width: 400px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  
+  .addform_style:focus, .addbtn:focus {
+    transform: translateY(4px);
+    box-shadow: 1px 2px 0px 0px #E99F4C;
+  }
+  
+  .addbtn {
+    padding: 15px;
+    margin: 25px 0px;
+    width: 100px;
+    font-size: 16px;
+    background: #96065c;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    box-shadow: 2px 2px 0px 0px #3d0122;
+  }
+  
+  .addbtn:hover {
+    opacity: .9;
+  }
+  
+  .addlink {
+    font-weight: 800;
+    color: #264143;
+    padding: 5px;
+  }

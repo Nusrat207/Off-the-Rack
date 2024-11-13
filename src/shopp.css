@@ -1,0 +1,28 @@
+li.main-category {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid rgb(182, 180, 180);
+  }
+  
+  li.main-category:hover {
+    background-color: #f9b2cc78;
+  }
+
+  .sub{
+    transition: background-color 0.3s ease;
+    
+  }
+  .sub:hover{
+    background-color: #f9b2cc63;
+  }
+
+  .lilink{
+    text-decoration:none;
+     color: black; 
+     font-weight:bold; 
+     font-style: revert;
+  }
+  .lilink:hover{
+    color:rgb(157, 8, 105);
+  }

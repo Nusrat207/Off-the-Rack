@@ -1,0 +1,341 @@
+:root {
+	
+	--authForm-white: #e9e9e9;
+	--authForm-gray: #333;
+	--authForm-blue: #0367a6;
+	--authForm-lightblue: #008997;
+
+	
+	--authForm-button-radius: 0.7rem;
+
+	
+	--authForm-max-width: 758px;
+	--authForm-max-height: 420px;
+
+	font-size: 16px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.authForm__body {
+	align-items: center;
+	background-color: var(--authForm-white);
+	
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	display: flex;
+	/* height: 100vh;
+	margin: 0;
+	*/
+	place-items: center;
+	justify-content: center;
+	 
+}
+/*
+background-attachment: fixed;
+
+*/
+
+
+.authForm__formTitle {
+	font-weight: 300;
+	margin: 0;
+	margin-bottom: 1.25rem;
+}
+
+.authForm__link {
+	color: var(--authForm-gray);
+	font-size: 0.9rem;
+	margin: 1rem 0;
+	text-decoration: none;
+}
+
+.authForm__container {
+	
+	/* height: var(--authForm-max-height);
+	max-width: var(--authForm-max-width); */
+/*	height: 700px;
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+	padding: 300px;
+	background-color: var(--authForm-white);
+	border-radius: var(--authForm-button-radius);
+	box-shadow: 0 0.9rem 1.7rem rgba(0, 0, 0, 0.25),
+		0 0.7rem 0.7rem rgba(0, 0, 0, 0.22);
+*/
+
+	position: relative;
+    width: 90%;
+  
+    height: 700px; 
+    margin: 20px auto; 
+   
+    z-index: 2;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+    background: #fff; 
+    padding: 20px; 
+}
+
+
+.authForm__containerForm {
+	height: 100%;
+	position: absolute;
+	top: 0;
+	transition: all 0.6s ease-in-out;
+}
+
+.authForm__containerSignin {
+	left: 0;
+	width: 50%;
+	z-index: 2;
+}
+
+.authForm__containerRightPanelActive .authForm__containerSignin {
+	transform: translateX(100%);
+}
+
+.authForm__containerSignup {
+	left: 0;
+	opacity: 0;
+	width: 50%;
+	z-index: 1;
+}
+
+.authForm__containerRightPanelActive .authForm__containerSignup {
+	animation: authForm__show 0.6s;
+	opacity: 1;
+	transform: translateX(100%);
+	z-index: 5;
+}
+
+.authForm__containerOverlay {
+	height: 100%;
+	left: 50%;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	transition: transform 0.6s ease-in-out;
+	width: 50%;
+	z-index: 100;
+}
+
+.authForm__containerRightPanelActive .authForm__containerOverlay {
+	transform: translateX(-100%);
+}
+/*	
+
+background: url("https://res.cloudinary.com/dci1eujqw/image/upload/v1616769558/Codepen/waldemar-brandt-aThdSdgx0YM-unsplash_cnq4sb.jpg");
+
+background: url('./signupp.svg');  */
+.authForm__overlay {
+	background-color: var(--authForm-lightblue);
+	
+	background: url('./img/bg1.png'); 
+	background-size: contain; 
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+
+	height:100%;
+	left: -100%;
+	position: relative;
+	transform: translateX(0);
+	transition: transform 0.6s ease-in-out;
+	width: 200%;
+}
+
+.authForm__containerRightPanelActive .authForm__overlay {
+	transform: translateX(50%);
+}
+
+.authForm__overlayPanel {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	justify-content: center;
+	position: absolute;
+	text-align: center;
+	top: 0;
+	transform: translateX(0);
+	transition: transform 0.6s ease-in-out;
+	width: 50%;
+}
+
+.authForm__overlayLeft {
+	transform: translateX(-20%);
+}
+
+.authForm__containerRightPanelActive .authForm__overlayLeft {
+	transform: translateX(0);
+}
+
+.authForm__overlayRight {
+	right: 0;
+	transform: translateX(0);
+}
+
+.authForm__containerRightPanelActive .authForm__overlayRight {
+	transform: translateX(20%);
+}
+
+.authForm__btn {
+	background-color: var(--authForm-blue);
+	background-image: linear-gradient(90deg, var(--authForm-blue) 0%, var(--authForm-lightblue) 74%);
+	border-radius: 20px;
+	border: 1px solid var(--authForm-blue);
+	color: var(--authForm-white);
+	cursor: pointer;
+	font-size: 0.8rem;
+	font-weight: bold;
+	letter-spacing: 0.1rem;
+	padding: 0.9rem 4rem;
+	text-transform: uppercase;
+	transition: transform 80ms ease-in;
+}
+
+.authForm__form > .authForm__btn {
+	margin-top: 1.5rem;
+}
+
+.authForm__btn:active {
+	transform: scale(0.95);
+}
+
+.authForm__btn:focus {
+	outline: none;
+}
+
+.authForm__form {
+	background-color: rgb(255, 255, 255);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	
+	height: 75%;
+	margin: 0;
+}
+
+.authForm__form2 {
+	background-color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	
+	height: 85%;
+	margin: 0;
+}
+
+.authForm__input {
+	/* background-color: #fff;
+	border: none;
+	padding: 0.9rem 0.9rem;
+	margin: 0.5rem 0;
+	width: 100%; */
+	margin-left: 10px;
+    border-radius: 10px;
+    border-width: 2px;
+	border-color: black;
+    width: 85%;
+    height: 50px;
+    padding-left: 30px; 
+	padding-bottom: 15px;
+}
+
+
+.flex_column {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+	
+	width: 77%;
+
+
+}
+.inputForm {
+    border: 1.5px solid #ecedec;
+    border-radius: 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    transition: 0.2s ease-in-out;
+    position: relative; 
+}
+.input {
+    margin-left: 10px;
+    border-radius: 10px;
+    border: none;
+	width: 150px;
+    height: 100%;
+    padding-left: 30px; 
+	flex: 1; 
+}
+.input:focus {
+    outline: none;
+	border-color: #2d79f3; 
+}
+.inputForm:focus-within {
+    border: 1.5px solid #2d79f3;
+}
+.input_icon {
+    position: absolute;
+    left: 10px; 
+    width: 20px; 
+    height: 20px; 
+    pointer-events: none; 
+}
+.button_submit {
+    margin: 10px 0 10px 0;
+    background-color: #8aecff;
+    border: none;
+    color: black;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    height: 50px;
+    width: 60%;
+    cursor: pointer;
+
+	text-transform: uppercase;
+	transition: transform 80ms ease-in;
+  }
+
+  .button_submit:hover {
+    background-color: #24a0ed;
+  }
+
+  .button_submit:active {
+	transform: scale(0.95);
+}
+
+
+.line {
+    border-bottom: 1px solid #000; 
+    width: 100%; 
+    display: block; 
+    margin: 10px 0; 
+}
+
+
+@keyframes authForm__show {
+	0%,
+	49.99% {
+		opacity: 0;
+		z-index: 1;
+	}
+
+	50%,
+	100% {
+		opacity: 1;
+		z-index: 5;
+	}
+}
