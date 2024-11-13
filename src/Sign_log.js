@@ -13,7 +13,7 @@ import Phone from './img/phone.png'
 import axios from 'axios';
 
 import { GoogleLogin } from '@leecheuk/react-google-login';
-import GoogleLoginButton from './GoogleLoginButton';
+
 const Sign_log = () => {
 
 
