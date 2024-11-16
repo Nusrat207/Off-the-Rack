@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./Products.css";
+import redTeeImage from "./img/red-tee.jpg";
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [viewDetailsProduct, setViewDetailsProduct] = useState(null);
+  const [imageModal, setImageModal] = useState(null);
   const [products, setProducts] = useState([]);
 
   const categories = {
@@ -15,27 +18,66 @@ const Products = () => {
 
   // useEffect to fetch products based on selected category and subcategory
   useEffect(() => {
-    const fetchProducts = async () => {
+ const fetchProducts = async () => {
       if (selectedCategory && selectedSubCategory) {
         try {
           const response = await fetch(
             `/products?category=${selectedCategory}&subcategory=${selectedSubCategory}`
           );
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
           const data = await response.json();
           console.log("Fetched data:", data); // Log the fetched data
           setProducts(data);
         } catch (error) {
           console.error("Error fetching products:", error);
+          setProducts([]); // Clear products on error
         }
+      } else {
+        setProducts([]); // Clear products if no category or subcategory is selected
       }
     };
 
     fetchProducts();
   }, [selectedCategory, selectedSubCategory]);
 
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+    setSelectedSubCategory(null);
+    setProducts([]); // Clear products when category changes
+  };
+
+  const handleSubCategoryClick = (subCategory) => {
+    setSelectedSubCategory(subCategory);
+  };
+
+  const handleViewDetails = (product) => {
+    setViewDetailsProduct(product);
+  };
+
+  const closeDetailsModal = () => {
+    setViewDetailsProduct(null);
+  };
+
+  const closeImageModal = () => {
+    setImageModal(null);
+  };
+
+  const updateStock = (size, newStock) => {
+    if (viewDetailsProduct) {
+      const updatedDetails = { ...viewDetailsProduct.details };
+      updatedDetails.sizes[size].stock = newStock;
+
+      setViewDetailsProduct({
+        ...viewDetailsProduct,
+        details: updatedDetails,
+      });
+    }
+  };
+
   return (
     <div className="products-container">
-      {/* Category Selection */}
       <div className="category-tabs">
         {Object.keys(categories).map((category) => (
           <div
@@ -43,18 +85,13 @@ const Products = () => {
             className={`category-tab ${
               selectedCategory === category ? "active-tab" : ""
             }`}
-            onClick={() => {
-              setSelectedCategory(category);
-              setSelectedSubCategory(null);
-              setProducts([]); // Clear products when category changes
-            }}
+            onClick={() => handleCategoryClick(category)}
           >
             {category}
           </div>
         ))}
       </div>
 
-      {/* Subcategory Selection */}
       {selectedCategory && (
         <div className="subcategory-menu">
           {categories[selectedCategory].map((subCategory) => (
@@ -63,7 +100,7 @@ const Products = () => {
               className={`subcategory ${
                 selectedSubCategory === subCategory ? "active-sub" : ""
               }`}
-              onClick={() => setSelectedSubCategory(subCategory)}
+              onClick={() => handleSubCategoryClick(subCategory)}
             >
               {subCategory}
             </span>
@@ -71,7 +108,6 @@ const Products = () => {
         </div>
       )}
 
-      {/* Product Table */}
       <div className="product-table">
         {selectedSubCategory ? ( // Check if a subcategory is selected
           products.length > 0 ? (
@@ -92,12 +128,13 @@ const Products = () => {
               </thead>
               <tbody>
                 {products.map((product) => (
-                  <tr key={product.code}>
+                  <tr key={product.id}>
                     <td>
                       <img
                         src={product.img}
                         alt={product.product_name}
                         className="product-image"
+                        onClick={() => setImageModal(product.img)}
                       />
                     </td>
                     <td>{product.product_name}</td>
@@ -109,7 +146,10 @@ const Products = () => {
                     <td>{product.brand}</td>
                     <td>{product.discount}%</td>
                     <td>
-                      <button className="view-details">
+                      <button
+                        className="view-details"
+                        onClick={() => handleViewDetails(product)}
+                      >
                         View Details
                       </button>
                     </td>
@@ -121,16 +161,71 @@ const Products = () => {
             <p>No products available for this subcategory.</p>
           )
         ) : (
-          <p>Select the type you want to check.</p> // Show this message only if no subcategory is selected
+          <p>Select the subcategory you want to check.</p> // Show this message only if no subcategory is selected
         )}
       </div>
+
+      {viewDetailsProduct && (
+        <div className="product-details-modal">
+          <h2>{viewDetailsProduct.product_name} - Details</h2>
+          <p>
+            <strong>Price:</strong> {viewDetailsProduct.base_price}
+          </p>
+          <p>
+            <strong>Description:</strong> {viewDetailsProduct.descrip}
+          </p>
+          <p>
+            <strong >Color:</strong> {viewDetailsProduct.color}
+          </p>
+          <p>
+            <strong>Sizes and Stock:</strong>
+          </p>
+          <table className="size-stock-table">
+            <thead>
+              <tr>
+                <th>Size</th>
+                <th>Stock</th>
+                <th>Update Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(viewDetailsProduct.details.sizes).map((size) => (
+                <tr key={size}>
+                  <td>{size}</td>
+                  <td>{viewDetailsProduct.details.sizes[size].stock}</td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="New stock"
+                      onChange={(e) =>
+                        updateStock(size, parseInt(e.target.value, 10))
+                      }
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button className="close-modal" onClick={closeDetailsModal}>
+            Close
+          </button>
+        </div>
+      )}
+
+      {imageModal && (
+        <div className="image-modal">
+          <img src={imageModal} alt="Product" className="large-image" />
+          <button className="close-image-modal" onClick={closeImageModal}>
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Products;
-
-
 
 
 /*
@@ -369,4 +464,5 @@ const Products = () => {
   );
 };
 
-export default Products;*/
+export default Products;
+*/
