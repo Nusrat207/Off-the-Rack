@@ -4,7 +4,7 @@
     align-items: center;
     background-color: white;
     margin: 70px;
-    height: 990px;
+    height: 1400px;
     
 }
 
@@ -79,7 +79,7 @@
   .addbtn {
     padding: 15px;
     margin: 25px 0px;
-    width: 100px;
+    width: 150px;
     font-size: 16px;
     background: #96065c;
     border-radius: 10px;
