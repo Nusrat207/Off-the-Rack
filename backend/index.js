@@ -316,12 +316,29 @@ app.post('/addproduct', async (req, res) => {
       res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
-
+/*
 app.get('/products', async (req, res) => {
   const seller_name = req.query.seller_name;
 
   try {
       const result = await pool.query('SELECT product_name, category, subcategory, price, img FROM products WHERE seller = $1', [seller_name]);
+      res.status(200).json(result.rows);
+  } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+*/
+app.get('/products', async (req, res) => {
+  const { category, subcategory } = req.query;
+
+  try {
+      const query = `
+          SELECT product_name, category, subcategory, base_price, img, seller, code, descrip, color, brand, discount 
+          FROM products 
+          WHERE category = $1 AND subcategory = $2
+      `;
+      const result = await pool.query(query, [category, subcategory]);
       res.status(200).json(result.rows);
   } catch (error) {
       console.error('Error fetching products:', error);
