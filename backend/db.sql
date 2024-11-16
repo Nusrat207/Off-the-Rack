@@ -3,12 +3,9 @@ CREATE TABLE user_info (
     username TEXT,
     email TEXT UNIQUE,
     phone TEXT,
-    password TEXT, 
-    google_id TEXT, 
-    facebook_id TEXT 
+    password TEXT
 );
 
-select * from user_info;
 
 CREATE TABLE seller_info (
     id SERIAL PRIMARY KEY,
@@ -16,6 +13,7 @@ CREATE TABLE seller_info (
     email TEXT UNIQUE,
     phone TEXT,
     password TEXT, 
+    address text
 );
 
 CREATE TABLE products (
@@ -23,14 +21,20 @@ CREATE TABLE products (
     product_name TEXT,
     category TEXT,
     subcategory TEXT,
-    price TEXT,
+    base_price TEXT,
     img TEXT,
-    sizee TEXT,
     seller TEXT,
-    quantity integer,
     code TEXT,
     descrip TEXT,
-    color TEXT
+    color TEXT,
+    brand text,
+    discount DOUBLE PRECISION
+);
 
-    BRAND dite bhule gesi
+CREATE TABLE product_size(
+    product_id text,
+    product_name TEXT,
+	seller text,
+    sizee TEXT,
+    quantity TEXT
 );
