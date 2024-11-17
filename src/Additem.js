@@ -49,15 +49,15 @@ export default function Additem() {
         const selectedCategory = e.target.value;
         setCategory(selectedCategory);
         setSubcategories(categories[selectedCategory] || []);
-        setFormData({ ...formData, category: selectedCategory, sizee: [], quantity: [] }); // Reset size and quantity
+        setFormData({ ...formData, category: selectedCategory, sizee: [], quantity: [] }); 
         setSizeDisabled(selectedCategory === 'bags' || selectedCategory === 'jewellery');
-        setSizes(selectedCategory === 'bags' || selectedCategory === 'jewellery' ? [] : []); // No sizes for bags or jewellery
+        setSizes(selectedCategory === 'bags' || selectedCategory === 'jewellery' ? [] : []); 
     };
 
     const handleSubcategoryChange = (e) => {
         const selectedSubcategory = e.target.value;
         setSubcategory(selectedSubcategory);
-        setFormData({ ...formData, subcategory: selectedSubcategory, sizee: [], quantity: [] }); // Reset size and quantity
+        setFormData({ ...formData, subcategory: selectedSubcategory, sizee: [], quantity: [] });
         setSizes(sizeOptions[category]?.[selectedSubcategory] || sizeOptions[category] || []);
     };
 

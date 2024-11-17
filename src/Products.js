@@ -1,13 +1,19 @@
+import { Link, useNavigate } from 'react-router-dom'
 import React, { useState, useEffect } from "react";
 import "./Products.css";
 import redTeeImage from "./img/red-tee.jpg";
-
+import axios from "axios";
+import Seller_Menu from "./Seller_nav_side";
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [viewDetailsProduct, setViewDetailsProduct] = useState(null);
   const [imageModal, setImageModal] = useState(null);
   const [products, setProducts] = useState([]);
+  const [isAddNewSizeSelected, setIsAddNewSizeSelected] = useState(false);
+  const [isUpdateStockSelected, setIsUpdateStockSelected] = useState(false);
+  const [newSizes, setNewSizes] = useState([]);
+  const [updatedDiscount, setUpdatedDiscount] = useState('');
 
   const categories = {
     Clothes: ["T-shirt", "One Piece", "Three Piece", "Pant"],
@@ -16,26 +22,49 @@ const Products = () => {
     Bags: ["Bagpack", "Handbag"],
   };
 
-  // useEffect to fetch products based on selected category and subcategory
+  const sizeOptions = {
+    clothes: {
+      'T-shirt': ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+      'One Piece': ['30', '32', '34', '36', '38', '40', '42'],
+      'Three Piece': ['30', '32', '34', '36', '38', '40', '42'],
+      Pants: ['26', '28', '30', '32', '34', '36', '38', '40', '42']
+    },
+    footwear: ['34', '35', '36', '37', '38', '39', '40', '41', '42']
+  };
+  const handleRadioChange = (e) => {
+    if (e.target.value === "addNewSize") {
+      setIsAddNewSizeSelected(true);
+      setIsUpdateStockSelected(false);
+    } else if (e.target.value === "updateExistingStock") {
+      setIsUpdateStockSelected(true);
+      setIsAddNewSizeSelected(false);
+    }
+  };
+
+
   useEffect(() => {
- const fetchProducts = async () => {
+    const fetchProducts = async () => {
       if (selectedCategory && selectedSubCategory) {
         try {
-          const response = await fetch(
-            `/products?category=${selectedCategory}&subcategory=${selectedSubCategory}`
-          );
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          console.log("Fetched data:", data); // Log the fetched data
-          setProducts(data);
+          /* const response = await axios.get(
+             `/seller_products?category=${selectedCategory}&subcategory=${selectedSubCategory}`
+           ); */
+          const response = await axios.get('http://localhost:5000/seller_products', {
+            params: {
+              category: selectedCategory,
+              subcategory: selectedSubCategory
+            },
+          });
+
+
+          console.log("Fetched data:", response.data);
+          setProducts(response.data);
         } catch (error) {
           console.error("Error fetching products:", error);
-          setProducts([]); // Clear products on error
+          setProducts([]);
         }
       } else {
-        setProducts([]); // Clear products if no category or subcategory is selected
+        setProducts([]);
       }
     };
 
@@ -64,6 +93,11 @@ const Products = () => {
     setImageModal(null);
   };
 
+  const handleDiscountChange = (e) => {
+    setUpdatedDiscount(e.target.value);
+  };
+  
+
   const updateStock = (size, newStock) => {
     if (viewDetailsProduct) {
       const updatedDetails = { ...viewDetailsProduct.details };
@@ -75,394 +109,387 @@ const Products = () => {
       });
     }
   };
+  const handleSizeChange = (size, qty) => {
+    // Update state with size and its corresponding quantity
+    setNewSizes(prevSizes => {
+      const updatedSizes = [...prevSizes];
+      const existingSizeIndex = updatedSizes.findIndex(item => item.size === size);
+
+      if (existingSizeIndex !== -1) {
+        updatedSizes[existingSizeIndex].qty = qty; // Update quantity if size already exists
+      } else {
+        updatedSizes.push({ size, qty }); // Add new size and qty pair
+      }
+
+      return updatedSizes;
+    });
+  };
+
+  let navigate = useNavigate();
+
+  const [updatedStock, setUpdatedStock] = useState({}); 
+
+  // Handle the change for stock updates
+  const handleStockChange = (size, value) => {
+    setUpdatedStock(prev => ({
+      ...prev,
+      [size]: value // Save the updated stock value for each size
+    }));
+  };
+  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const sellerName = localStorage.getItem("seller_name");
+
+    const productId = viewDetailsProduct.id;
+
+    if (isAddNewSizeSelected) {
+      const dataToSend = newSizes.map(sizeData => ({
+        seller: sellerName,
+        product_id: productId,
+        product_name: viewDetailsProduct.product_name,
+        sizee: sizeData.size,
+        quantity: sizeData.qty
+      }));
+
+      try {
+        const response = await axios.post('http://localhost:5000/add-sizes', {
+          sizes: dataToSend,
+          discount: updatedDiscount
+        });
+
+        console.log('Successfully added sizes:', response.data);
+
+        closeDetailsModal();
+        navigate("/Products");
+        window.location.reload();
+
+      } catch (error) {
+        console.error('Error adding sizes:', error);
+        alert('Error adding sizes');
+      }
+    } 
+    else if (isUpdateStockSelected) {
+      const dataToSend = viewDetailsProduct.sizes.map(sizeObj => {
+        
+        const updatedQty = updatedStock[sizeObj.size];
+        if (updatedQty && updatedQty !== sizeObj.stock) {
+          return {
+            seller: sellerName,
+            product_id: productId,
+            product_name: viewDetailsProduct.product_name,
+            sizee: sizeObj.size,
+            quantity: updatedQty
+          };
+        }
+        return null;
+      }).filter(item => item !== null);
+    
+      try {
+        const response = await axios.post('http://localhost:5000/update-stock', {
+          sizes: dataToSend,
+          discount: updatedDiscount
+        });
+    
+        console.log('Successfully updated stock:', response.data);
+
+        closeDetailsModal();
+        navigate("/Products");
+        window.location.reload();
+      } catch (error) {
+        console.error('Error updating stock:', error);
+        alert('Error updating stock');
+      }
+    } 
+    else{
+  
+      try {
+        const response = await axios.post('http://localhost:5000/updateDiscount', {
+          discount: updatedDiscount,
+          product_id: productId
+        });
+    
+        console.log('Successfully updated discount', response.data);
+
+        closeDetailsModal();
+        navigate("/Products");
+        window.location.reload();
+      } catch (error) {
+        console.error('Error updating stock:', error);
+        alert('Error updating stock');
+      }
+    }
+  };
 
   return (
-    <div className="products-container">
-      <div className="category-tabs">
-        {Object.keys(categories).map((category) => (
-          <div
-            key={category}
-            className={`category-tab ${
-              selectedCategory === category ? "active-tab" : ""
-            }`}
-            onClick={() => handleCategoryClick(category)}
-          >
-            {category}
-          </div>
-        ))}
-      </div>
-
-      {selectedCategory && (
-        <div className="subcategory-menu">
-          {categories[selectedCategory].map((subCategory) => (
-            <span
-              key={subCategory}
-              className={`subcategory ${
-                selectedSubCategory === subCategory ? "active-sub" : ""
-              }`}
-              onClick={() => handleSubCategoryClick(subCategory)}
+    <div> <Seller_Menu />
+      <div className="products-container">
+        <div className="category-tabs">
+          {Object.keys(categories).map((category) => (
+            <div
+              key={category}
+              className={`category-tab ${selectedCategory === category ? "active-tab" : ""
+                }`}
+              onClick={() => handleCategoryClick(category)}
             >
-              {subCategory}
-            </span>
+              {category}
+            </div>
           ))}
         </div>
-      )}
 
-      <div className="product-table">
-        {selectedSubCategory ? ( // Check if a subcategory is selected
-          products.length > 0 ? (
-            <table>
+        {selectedCategory && (
+          <div className="subcategory-menu">
+            {categories[selectedCategory].map((subCategory) => (
+              <span
+                key={subCategory}
+                className={`subcategory ${selectedSubCategory === subCategory ? "active-sub" : ""
+                  }`}
+                onClick={() => handleSubCategoryClick(subCategory)}
+              >
+                {subCategory}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="product-table">
+          {selectedSubCategory ? ( // Check if a subcategory is selected
+            products.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    {/*      <th>Seller</th> */}
+                    {/*      <th>Code</th> */}
+                    <th>Description</th>
+                    <th>Color</th>
+                    <th>Brand</th>
+                    <th>Discount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product) => (
+                    <tr key={product.id}>
+                      <td>
+                        <img
+                          src={product.img}
+                          alt={product.product_name}
+                          className="product-image"
+                          onClick={() => setImageModal(product.img)}
+                        />
+                      </td>
+                      <td>{product.product_name}</td>
+                      <td>{product.base_price}</td>
+                      {/*    <td>{product.seller}</td> */}
+                      {/*   <td>{product.code}</td> */}
+                      <td>{product.descrip}</td>
+                      <td>{product.color}</td>
+                      <td>{product.brand}</td>
+                      <td>{product.discount}%</td>
+                      <td>
+                        <button
+                          className="view-details"
+                          onClick={() => handleViewDetails(product)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No products available for this subcategory.</p>
+            )
+          ) : (
+            <p>Select the subcategory you want to check.</p>
+          )}
+        </div>
+
+        {viewDetailsProduct && (
+
+          <div className="product-details-modal" style={{ overflowY: "scroll", maxHeight: "80vh" }}>
+            <h4> {viewDetailsProduct.product_name}
+           <span style={{paddingLeft:'376px'}}> <button className="close-modal" onClick={closeDetailsModal}>
+              X
+            </button></span>
+
+            </h4>
+            <p>
+              <strong>Price:</strong> {viewDetailsProduct.base_price}
+            </p>
+            <p>
+              <strong>Color:</strong> {viewDetailsProduct.color}
+            </p>
+            <p>
+              <strong>Sizes and Stock:</strong>
+            </p>
+            <table className="size-stock-table">
               <thead>
                 <tr>
-                  <th>Image</th>
-                  <th>Product</th>
-                  <th>Price</th>
-                  <th>Seller</th>
-                  <th>Code</th>
-                  <th>Description</th>
-                  <th>Color</th>
-                  <th>Brand</th>
-                  <th>Discount</th>
-                  <th>Actions</th>
+                  <th>Size</th>
+                  <th>Stock</th>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      <img
-                        src={product.img}
-                        alt={product.product_name}
-                        className="product-image"
-                        onClick={() => setImageModal(product.img)}
-                      />
-                    </td>
-                    <td>{product.product_name}</td>
-                    <td>{product.base_price}</td>
-                    <td>{product.seller}</td>
-                    <td>{product.code}</td>
-                    <td>{product.descrip}</td>
-                    <td>{product.color}</td>
-                    <td>{product.brand}</td>
-                    <td>{product.discount}%</td>
-                    <td>
-                      <button
-                        className="view-details"
-                        onClick={() => handleViewDetails(product)}
-                      >
-                        View Details
-                      </button>
-                    </td>
+                {viewDetailsProduct.sizes.map((sizeObj, index) => (
+                  <tr key={index}>
+                    <td>{sizeObj.size}</td>
+                    <td>{sizeObj.stock}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          ) : (
-            <p>No products available for this subcategory.</p>
-          )
-        ) : (
-          <p>Select the subcategory you want to check.</p> // Show this message only if no subcategory is selected
-        )}
-      </div>
 
-      {viewDetailsProduct && (
-        <div className="product-details-modal">
-          <h2>{viewDetailsProduct.product_name} - Details</h2>
-          <p>
-            <strong>Price:</strong> {viewDetailsProduct.base_price}
-          </p>
-          <p>
-            <strong>Description:</strong> {viewDetailsProduct.descrip}
-          </p>
-          <p>
-            <strong >Color:</strong> {viewDetailsProduct.color}
-          </p>
-          <p>
-            <strong>Sizes and Stock:</strong>
-          </p>
-          <table className="size-stock-table">
-            <thead>
-              <tr>
-                <th>Size</th>
-                <th>Stock</th>
-                <th>Update Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(viewDetailsProduct.details.sizes).map((size) => (
-                <tr key={size}>
-                  <td>{size}</td>
-                  <td>{viewDetailsProduct.details.sizes[size].stock}</td>
-                  <td>
+            <div className="update-product-info" style={{ paddingTop: '15px' }}>
+
+              <h5 style={{ fontWeight: 'bold' }}>Update Product Information</h5>
+
+              <div className="update-discount" style={{ marginTop: "20px" }}>
+                <label htmlFor="discount" style={{ marginRight: "10px" }}>
+                  Update Discount:
+                </label>
+                <input
+                  type="number"
+                  id="discount"
+                  name="discount"
+                  placeholder="new discount"
+                  min="0"
+                  max="100"
+                  style={{ padding: "5px", width: "150px" }}
+                   onChange={handleDiscountChange}
+                />
+              </div>
+
+              <hr />
+              <div className="update-options">
+                <div>
+                  <label>
                     <input
-                      type="number"
-                      min="0"
-                      placeholder="New stock"
-                      onChange={(e) =>
-                        updateStock(size, parseInt(e.target.value, 10))
-                      }
+                      type="radio"
+                      name="updateOption"
+                      value="addNewSize"
+                      onChange={handleRadioChange}
                     />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button className="close-modal" onClick={closeDetailsModal}>
-            Close
-          </button>
-        </div>
-      )}
+                    Add New Sizes (if applicable)
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="updateOption"
+                      value="updateExistingStock"
+                      onChange={handleRadioChange}
+                    />
+                    Update Stock
+                  </label>
+                </div>
+              </div>
+              <hr />
 
-      {imageModal && (
-        <div className="image-modal">
-          <img src={imageModal} alt="Product" className="large-image" />
-          <button className="close-image-modal" onClick={closeImageModal}>
-            Close
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
+              {isAddNewSizeSelected && (
+                <div className="add-new-sizes">
+                  <h6 style={{ fontWeight: 'bold' }}>Add New Sizes</h6>
 
-export default Products;
+                  {selectedCategory === 'Clothes' && selectedSubCategory && (
+                    <div className="sizes-options">
+                      <p>Sizes:</p>
+                      {sizeOptions.clothes[selectedSubCategory] ? (
+                        sizeOptions.clothes[selectedSubCategory].map((size, index) => (
+                          <div key={index} style={{ marginBottom: "10px" }}>
+                            <label>
+                              {size}:
+                              <input
+                                type="number"
+                                min="0"
+                                placeholder="Qty"
+                                style={{ padding: "5px", width: "100px", marginLeft: "10px" }}
+                                onChange={(e) => handleSizeChange(size, e.target.value)}
+                              />
+                            </label>
+                          </div>
+                        ))
+                      ) : (
+                        <p>No sizes available for this subcategory.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {selectedCategory === 'Footwear' && (
+                    <div className="sizes-options">
+                      <p>Sizes:</p>
+                      {sizeOptions.footwear.map((size, index) => (
+                        <div key={index} style={{ marginBottom: "10px" }}>
+                          <label>
+                            {size}:
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="Qty"
+                              style={{ padding: "5px", width: "100px", marginLeft: "10px" }}
+                              onChange={(e) => handleSizeChange(size, e.target.value)}
+                            />
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {isUpdateStockSelected && (
+                <div className="update-stock">
+                  <h6 style={{ fontWeight: 'bold' }}>Update Stock for Existing Sizes</h6>
+                  <div className="existing-sizes">
+                    {viewDetailsProduct.sizes.map((sizeObj, index) => (
+                      <div key={index} style={{ marginBottom: "10px" }}>
+                        <label>
+                          {sizeObj.size}:
+                          <input
+                            type="number"
+                            min="0"
+                            id={`stock-${sizeObj.size}`}
+                            defaultValue={sizeObj.stock}
+                            placeholder="New Qty"
+                            style={{ padding: "5px", width: "100px", marginLeft: "10px" }}
+                            onChange={(e) => handleStockChange(sizeObj.size, e.target.value)} 
+                          />
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
 
-/*
-import React, { useState } from "react";
-import "./Products.css";
-import redTeeImage from "./img/red-tee.jpg";
+            </div>
 
-const Products = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-  const [viewDetailsProduct, setViewDetailsProduct] = useState(null);
-  const [imageModal, setImageModal] = useState(null);
+            <button className="close-modal" onClick={handleSubmit}>Save</button>
 
-  const categories = {
-    Clothes: ["T-shirt", "One Piece", "Three Piece", "Pant"],
-    Jewellery: ["Ring", "Earring", "Necklace", "Bracelet"],
-    Footwear: ["Sandal", "Heels", "Sneakers"],
-    Bags: ["Bagpack", "Handbag"],
-  };
-
-  const products = [
-    {
-      id: 1,
-      product_name: "Red Tee",
-      category: "Clothes",
-      subcategory: "T-shirt",
-      base_price: "500 tk",
-      img: redTeeImage,
-      seller: "Seller A",
-      code: "RT-001",
-      descrip: "Stylish red t-shirt for casual wear.",
-      color: "Red",
-      brand: "Brand X",
-      discount: 10,
-      details: { sizes: { S: { stock: 10 }, M: { stock: 5 }, L: { stock: 5 } } },
-    },
-    {
-      id: 2,
-      product_name: "Blue One Piece",
-      category: "Clothes",
-      subcategory: "One Piece",
-      base_price: "1000 tk",
-      img: "/path/to/onepiece-image.jpg",
-      seller: "Seller B",
-      code: "OP-002",
-      descrip: "Elegant blue one-piece dress.",
-      color: "Blue",
-      brand: "Brand Y",
-      discount: 15,
-      details: { sizes: { S: { stock: 5 }, M: { stock: 0 }, L: { stock: 5 } } },
-    },
-    // Add more products here...
-  ];
-
-  const filteredProducts = products.filter(
-    (product) =>
-      selectedCategory === product.category &&
-      selectedSubCategory === product.subcategory
-  );
-
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
-    setSelectedSubCategory(null);
-  };
-
-  const handleSubCategoryClick = (subCategory) => {
-    setSelectedSubCategory(subCategory);
-  };
-
-  const handleViewDetails = (product) => {
-    setViewDetailsProduct(product);
-  };
-
-  const closeDetailsModal = () => {
-    setViewDetailsProduct(null);
-  };
-
-  const closeImageModal = () => {
-    setImageModal(null);
-  };
-
-  const updateStock = (size, newStock) => {
-    if (viewDetailsProduct) {
-      const updatedDetails = { ...viewDetailsProduct.details };
-      updatedDetails.sizes[size].stock = newStock;
-
-      setViewDetailsProduct({
-        ...viewDetailsProduct,
-        details: updatedDetails,
-      });
-    }
-  };
-
-  return (
-    <div className="products-container">
-      <div className="category-tabs">
-        {Object.keys(categories).map((category) => (
-          <div
-            key={category}
-            className={`category-tab ${
-              selectedCategory === category ? "active-tab" : ""
-            }`}
-            onClick={() => handleCategoryClick(category)}
-          >
-            {category}
+          
           </div>
-        ))}
-      </div>
-
-      {selectedCategory && (
-        <div className="subcategory-menu">
-          {categories[selectedCategory].map((subCategory) => (
-            <span
-              key={subCategory}
-              className={`subcategory ${
-                selectedSubCategory === subCategory ? "active-sub" : ""
-              }`}
-              onClick={() => handleSubCategoryClick(subCategory)}
-            >
-              {subCategory}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="product-table">
-        {filteredProducts.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Seller</th>
-                <th>Code</th>
-                <th>Description</th>
-                <th>Color</th>
-                <th>Brand</th>
-                <th>Discount</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product) => (
-                <tr key={product.id}>
-                  <td>
-                    <img
-                      src={product.img}
-                      alt={product.product_name}
-                      className="product-image"
-                      onClick={() => setImageModal(product.img)}
-                    />
-                  </td>
-                  <td>{product.product_name}</td>
-                  <td>{product.base_price}</td>
-                  <td>{product.seller}</td>
-                  <td>{product.code}</td>
-                  <td>{product.descrip}</td>
-                  <td>{product.color}</td>
-                  <td>{product.brand}</td>
-                  <td>{product.discount}%</td>
-                  <td>
-                    <button
-                      className="view-details"
-                      onClick={() => handleViewDetails(product)}
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>SELECT THE SUBCATEGORY YOU WANT TO CHECK.</p>
         )}
-      </div>
 
-      {viewDetailsProduct && (
-        <div className="product-details-modal">
-          <h2>{viewDetailsProduct.product_name} - Details</h2>
-          <p>
-            <strong>Price:</strong> {viewDetailsProduct.base_price}
-          </p>
-          <p>
-            <strong>Description:</strong> {viewDetailsProduct.descrip}
-          </p>
-          <p>
-            <strong>Color:</strong> {viewDetailsProduct.color}
-          </p>
-          <p>
-            <strong>Sizes and Stock:</strong>
-          </p>
-          <table className="size-stock-table">
-            <thead>
-              <tr>
-                <th>Size</th>
-                <th>Stock</th>
-                <th>Update Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(viewDetailsProduct.details.sizes).map((size) => (
-                <tr key={size}>
-                  <td>{size}</td>
-                  <td>{viewDetailsProduct.details.sizes[size].stock}</td>
-                  <td>
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="New stock"
-                      onChange={(e) =>
-                        updateStock(size, parseInt(e.target.value, 10))
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button className="close-modal" onClick={closeDetailsModal}>
-            Close
-          </button>
-        </div>
-      )}
 
-      {imageModal && (
-        <div className="image-modal">
-          <img src={imageModal} alt="Product" className="large-image" />
-          <button className="close-image-modal" onClick={closeImageModal}>
-            Close
-          </button>
-        </div>
-      )}
-    </div>
+
+        {imageModal && (
+          <div className="image-modal">
+            <img src={imageModal} alt="Product" className="large-image" />
+            <button className="close-image-modal" onClick={closeImageModal}>
+              Close
+            </button>
+          </div>
+        )}
+      </div> </div>
   );
 };
 
 export default Products;
-*/
+

@@ -25,9 +25,9 @@ export default function Shop() {
        <Shop_header />
       
       <div className="container" style={{ backgroundColor:'transparent',marginTop: '20px', position: 'relative', zIndex: 1 }}>
-        <div className="row" style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+        <div className="row" style={{ display: 'flex', gap: '60px', flexWrap: 'wrap' }}>
           {products.map((product, index) => (
-            <div className="col-12 col-md-6 col-lg-3" key={index}>
+            <div className="col-12 col-md-6 col-lg-2" key={index}>
               <ProductCard product={product} />
             </div>
           ))}
@@ -35,31 +35,30 @@ export default function Shop() {
       </div>
       <Footerr/>
     </div>
-
   );
 }
 
 function ProductCard({ product }) {
   return (
     <div style={{ paddingRight:'50px',
-            width: '250px', height: '350px', borderRadius: '0', display: 'flex',
+            width: '230px', height: '322px', borderRadius: '0', display: 'flex',
       flexDirection: 'column', alignItems: 'center', overflow: 'hidden', justifyContent: 'center',
-      boxShadow: '20px 20px 60px #bebebe, -20px -20px 60px #ffffff', background: '#fff'
+      boxShadow: '10px 10px 30px #e6e6e6, -10px -10px 30px #ffffff', background: '#fff'
     }}>
       <img 
         src={product.img} 
         className="card-img-top" 
         alt={product.product_name} 
-        style={{ height: "280px", objectFit: "cover" }} 
+        style={{ height: "235px", objectFit: "cover" }} 
       />
       <div className="card-body">
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div className="card-title" style={{ fontWeight: 'bold', fontSize: '15px' }}>
+          <div className="card-title" style={{ fontWeight: 'bold', fontSize: '14px' }}>
             {product.product_name}
           </div>
         </div>
-        <div style={{ fontSize: '13px', color: '#ab0965', fontWeight: 'bold' }}>
-          Tk {product.price}
+        <div style={{ fontSize: '12px', color: '#ab0965', fontWeight: 'bold' }}>
+          Tk {product.base_price}
         </div>
       </div>
     </div>

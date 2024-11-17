@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './sidebar.module.css';
 
 import { Link, useNavigate } from 'react-router-dom'
-
+import axios from 'axios';
 
 import Seller_Menu from './Seller_nav_side';
 
@@ -12,10 +12,10 @@ export default function Seller_Home() {
 
     //dummy data for now. data will be fetched from db
     const [sellerInfo, setSellerInfo] = useState({
-        name: "Seller Name",
-        email: "seller@example.com",
-        phone: "123-456-7890",
-        address: "123 Seller St, City, State"
+        name: '',
+        email: '',
+        phone: '',
+        address: ''
     });
 
     const handleEditClick = () => setIsEditing(!isEditing);  
@@ -29,6 +29,35 @@ export default function Seller_Home() {
         setIsEditing(false);
         // Later: Save updated info to the database here
     };
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchSellerInfo = async () => {
+            try {
+                const email = localStorage.getItem('seller_mail'); 
+
+                if (!email) {
+                    throw new Error('Seller email is not available in local storage.');
+                }
+
+                const response = await axios.get('http://localhost:5000/seller-info', {
+                    params: { email }, 
+                });
+                const { shop_name, email: sellerEmail, phone, address } = response.data;
+
+                setSellerInfo({
+                    name: shop_name,
+                    email: sellerEmail,
+                    phone,
+                    address,
+                });
+            } catch (err) {
+                setError(err.response?.data?.message || err.message);
+            }
+        };
+
+        fetchSellerInfo();
+    }, []);
     
     return (
         <div style={{paddingTop:'80px'}}>
@@ -38,7 +67,7 @@ export default function Seller_Home() {
            
              <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
                  
-                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '20px' }}>Hello, [Seller Name]!</h1>
+                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '20px' }}>Shop/Business: {sellerInfo.name}</h1>
               
                    <div style={{
                             padding: '20px',
@@ -49,7 +78,7 @@ export default function Seller_Home() {
                             position: 'relative',
                             backgroundColor:'white'
                         }}>
-                            <h2 style={{ fontSize: '20px', marginBottom: '10px' }}>Your Info</h2>
+                            <h2 style={{ fontSize: '20px', marginBottom: '14px', fontWeight:'bold' }}>Profile</h2>
                             <div style={{ marginBottom: '10px' }}>
                                 <label>Email: </label>
                                 {isEditing ? (

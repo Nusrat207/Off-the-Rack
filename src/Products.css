@@ -222,6 +222,7 @@
     border-radius: 15px;
     box-shadow: 4px 4px #570232;
     margin: 20px;
+    padding-top: 80px;
   }
   
   .category-tabs {
@@ -281,11 +282,12 @@
   }
   
   .product-image {
-    width: 50px;
+    height: 180px;
     cursor: pointer;
   }
   
   .product-details-modal {
+    width: 40%;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -326,12 +328,10 @@
   }
   
 
-  /* Additional styles retained for close buttons */
-
 .close-modal,
 .close-image-modal {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 0px;
   padding: 8px 15px;
   background-color: #c90c77;
   color: white;
