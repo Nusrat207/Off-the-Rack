@@ -57,7 +57,7 @@ export default function Seller_Menu() {
                     <div className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarshow : ''}`} id='sidebar'>
                         <ul>
                             <li style={{ paddingBottom: '6px' }}><Link to="/sellerHome">  <img src={Home} style={{ width: '26px', paddingRight: '7px' }} /> Home</Link></li>
-                            <li style={{ paddingBottom: '6px' }}><Link to="/sellerInventory"> <img src={Products} style={{ width: '26px', paddingRight: '7px' }} /> Products</Link></li>
+                            <li style={{ paddingBottom: '6px' }}><Link to="/Products"> <img src={Products} style={{ width: '26px', paddingRight: '7px' }} /> Products</Link></li>
                             <li style={{ paddingBottom: '6px' }}><Link to="/addItem">  <img src={Add} style={{ width: '26px', paddingRight: '7px' }} /> Add Products</Link></li>
                             <li style={{ paddingBottom: '6px' }}><Link to="/seller_order">  <img src={Order} style={{ width: '26px', paddingRight: '7px' }} /> Orders</Link></li>
                             <li style={{ paddingBottom: '6px' }}><Link to="/sell_review">  <img src={Review} style={{ width: '26px', paddingRight: '7px' }} /> Reviews</Link></li>

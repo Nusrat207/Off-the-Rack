@@ -14,6 +14,8 @@ import Myprofile from './Myprofile';
 import EditProfile from './EditProfile';
 import Additem from './Additem';
 import Seller_inventory from './Seller_inventory';
+import Products from './Products';
+
 
 function App() {
   return (
@@ -31,6 +33,7 @@ function App() {
         <Route exact path="/edit-profile" element={ <EditProfile/>} />
         <Route exact path="/addItem" element={ <Additem/>} />
         <Route exact path="/sellerinventory" element={ <Seller_inventory/>} />
+        <Route exact path="/products" element={<Products/>} />
         </Routes>
       </div>
     </Router>
