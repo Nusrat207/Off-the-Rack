@@ -38,3 +38,5 @@ CREATE TABLE product_size(
     sizee TEXT,
     quantity TEXT
 );
+
+
