@@ -39,4 +39,24 @@ CREATE TABLE product_size(
     quantity TEXT
 );
 
+SELECT 
+    p.id, 
+    p.product_name, 
+    p.category, 
+    p.subcategory, 
+    p.base_price, 
+    p.img, 
+    p.seller, 
+    p.code, 
+    p.descrip, 
+    p.color, 
+    p.brand, 
+    p.discount, 
+    json_agg(json_build_object('size', ps.sizee, 'stock', ps.quantity)) AS sizes
+FROM products p
+LEFT JOIN product_size ps ON p.id::TEXT = ps.product_id
+WHERE p.category ILIKE 'Clothes' AND p.subcategory ILIKE 'T-shirt'
+GROUP BY p.id;
 
+
+ALTER TABLE product_size ADD CONSTRAINT unique_product_size UNIQUE (product_id, sizee);

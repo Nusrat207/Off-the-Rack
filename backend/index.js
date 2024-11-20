@@ -316,54 +316,7 @@ app.post('/addproduct', async (req, res) => {
       res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
-/*
-app.get('/products', async (req, res) => {
-  const seller_name = req.query.seller_name;
 
-  try {
-      const result = await pool.query('SELECT product_name, category, subcategory, price, img FROM products WHERE seller = $1', [seller_name]);
-      res.status(200).json(result.rows);
-  } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
-});
-*/
-/*
-app.get('/products', async (req, res) => {
-  const { category, subcategory } = req.query;
-
-  try {
-      const query = `
-          SELECT product_name, category, subcategory, base_price, img, seller, code, descrip, color, brand, discount 
-          FROM products 
-          WHERE category = $1 AND subcategory = $2
-      `;
-      const result = await pool.query(query, [category, subcategory]);
-      res.status(200).json(result.rows);
-  } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
-});
-*/
-/*
-app.get('/products', async (req, res) => {
-  const { category, subcategory } = req.query;
-
-  try {
-    const query = `
-      SELECT product_name, category, subcategory, base_price, img, seller, code, descrip, color, brand, discount 
-      FROM products 
-      WHERE category = $1 AND subcategory = $2
-    `;
-    const result = await pool.query(query, [category, subcategory]);
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error : 'Internal server error' });
-  }
-});*/
 
 app.get('/products', async (req, res) => {
   const { category, subcategory } = req.query;
@@ -389,7 +342,7 @@ app.get('/products', async (req, res) => {
 
 app.get('/all-products', async (req, res) => {
   try {
-    const result = await pool.query('SELECT product_name, category, subcategory, price, img FROM products');
+    const result = await pool.query('SELECT product_name, category, subcategory, base_price, img FROM products');
     res.status(200).json(result.rows);
     //console.log(result.rows);
   } catch (error) {
@@ -398,102 +351,7 @@ app.get('/all-products', async (req, res) => {
   }
 });
 
-/*
-app.post('/addproductz', async (req, res) => {
-  const { product_name, category, subcategory, base_price, img, seller, descrip, color, sizee, quantity, brand, bagJewelryQuantity } = req.body;
 
-  const productQuery = 'INSERT INTO products (product_name, category, subcategory, base_price, img, seller, code, descrip, color, brand) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id';
-  
-  try {
-    const seller_email = req.body.seller;
-
-    const sellerResult = await pool.query('SELECT shop_name FROM seller_info WHERE email = $1', [seller_email]);
-      
-      if (sellerResult.rows.length === 0) {
-          return res.status(404).json({ error: 'Seller not found' });
-      }
-
-      const seller = sellerResult.rows[0].shop_name;
-      const productCode = uuidv4();
-
-      const productResult = await pool.query(productQuery, [product_name, category, subcategory, base_price, img, seller, productCode, descrip, color, brand]);
-      const productId = productResult.rows[0].id; 
-
-      if (category === 'bags' || category === 'jewellery') {
-          const qty = bagJewelryQuantity || 0;  
-          await pool.query(
-              'INSERT INTO product_size (product_id, product_name, seller, sizee, quantity) VALUES ($1, $2, $3, $4, $5)',
-              [productId, product_name, seller, 'N/A', qty] 
-          );
-      } else {
-     
-          const sizeInsertQueries = sizee.map((size, index) => {
-              const qty = quantity[index]?.quantity || '0';  
-              return pool.query(
-                  'INSERT INTO product_size (product_id, product_name, seller, sizee, quantity) VALUES ($1, $2, $3, $4, $5)',
-                  [productId, product_name, seller, size, qty]
-              );
-          });
-
-          await Promise.all(sizeInsertQueries);
-      }
-
-      res.status(200).json({ message: 'Product and sizes added successfully!' });
-  } catch (err) {
-      console.error('Error inserting product and size data:', err);
-      res.status(500).json({ message: 'Error inserting product or size data', error: err });
-  }
-});
-
-app.post('/addproductzz', async (req, res) => {
-  try {
-    console.log('Request body:', req.body);
-
-    const seller_email = req.body.seller;
-    const sellerResult = await pool.query('SELECT shop_name FROM seller_info WHERE email = $1', [seller_email]);
-
-    if (sellerResult.rows.length === 0) {
-      console.log('Seller not found for email:', seller_email);
-      return res.status(404).json({ error: 'Seller not found' });
-    }
-
-    const seller = sellerResult.rows[0].shop_name;
-    const productCode = uuidv4();
-    console.log('Inserting product with code:', productCode);
-
-    const productResult = await pool.query(productQuery, [
-      product_name, category, subcategory, base_price, img, seller, productCode, descrip, color, brand
-    ]);
-    const productId = productResult.rows[0].id;
-    console.log('Inserted product ID:', productId);
-
-    if (category === 'bags' || category === 'jewellery') {
-      console.log('Inserting bag/jewelry quantity:', bagJewelryQuantity);
-      const qty = bagJewelryQuantity || 0;
-      await pool.query(
-        'INSERT INTO product_size (product_id, product_name, seller, sizee, quantity) VALUES ($1, $2, $3, $4, $5)',
-        [productId, product_name, seller, 'N/A', qty]
-      );
-    } else {
-      console.log('Inserting sizes and quantities:', sizee, quantity);
-      const sizeInsertQueries = sizee.map((size, index) => {
-        const qty = quantity[index]?.quantity || '0';
-        return pool.query(
-          'INSERT INTO product_size (product_id, product_name, seller, sizee, quantity) VALUES ($1, $2, $3, $4, $5)',
-          [productId, product_name, seller, size, qty]
-        );
-      });
-
-      await Promise.all(sizeInsertQueries);
-    }
-
-    res.status(200).json({ message: 'Product and sizes added successfully!' });
-  } catch (err) {
-    console.error('Error inserting product and size data:', err);
-    res.status(500).json({ message: 'Error inserting product or size data', error: err.message });
-  }
-});
-*/
 app.post('/addproductz', async (req, res) => {
   const { product_name, category, subcategory, base_price, img, seller, descrip, color, sizee, quantity, brand, bagJewelryQuantity } = req.body;
 
@@ -537,5 +395,179 @@ app.post('/addproductz', async (req, res) => {
   } catch (err) {
     console.error('Error inserting product and size data:', err);
     res.status(500).json({ message: 'Error inserting product or size data', error: err });
+  }
+});
+
+
+app.get('/seller-info', async (req, res) => {
+  const email = req.query.email; 
+
+  try {
+      const result = await pool.query(
+          'SELECT shop_name, email, phone, address FROM seller_info WHERE email = $1',
+          [email]
+      );
+
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Seller not found' });
+      }
+
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error('Error fetching seller info:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/update-seller-info', async (req, res) => {
+  const { email, currentPassword, newPassword, phone, address, shopName } = req.body;
+
+  try {
+      
+      const result = await pool.query('SELECT password FROM seller_info WHERE email = $1', [email]);
+      
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Seller not found' });
+      }
+
+      const storedPassword = result.rows[0].password;
+
+      const validPassword = await bcrypt.compare(currentPassword, user.password);
+      
+      if (!validPassword) {
+          return res.status(400).json({ error: 'Current password is incorrect' });
+      }
+
+      const updateQuery = `
+          UPDATE seller_info 
+          SET phone = $1, address = $2, shop_name = $3, password = $4 
+          WHERE email = $5
+      `;
+      
+      await pool.query(updateQuery, [phone, address, shopName, newPassword || storedPassword, email]);
+
+      res.status(200).json({ message: 'Seller info updated successfully' });
+  } catch (error) {
+      console.error('Error updating seller info:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.get("/seller_products", async (req, res) => {
+  const { category, subcategory } = req.query;
+
+  const query = `
+    SELECT 
+        p.id, 
+        p.product_name, 
+        p.category, 
+        p.subcategory, 
+        p.base_price, 
+        p.img, 
+        p.seller, 
+        p.code, 
+        p.descrip, 
+        p.color, 
+        p.brand, 
+        p.discount, 
+        json_agg(json_build_object('size', ps.sizee, 'stock', ps.quantity)) AS sizes
+    FROM products p
+    LEFT JOIN product_size ps ON p.id::TEXT = ps.product_id
+    WHERE p.category ILIKE $1 AND p.subcategory ILIKE $2
+    GROUP BY p.id;
+  `;
+
+  try {
+   // console.log("Received category:", category);
+   // console.log("Received subcategory:", subcategory);
+
+    const { rows } = await pool.query(query, [category, subcategory]);
+
+    //console.log("Query result:", rows);
+
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({ error: "Error fetching products" });
+  }
+});
+
+
+app.post('/add-sizes', async (req, res) => {
+  const { sizes, discount } = req.body;
+
+  try {
+    if (discount >= 0 && discount <= 100) {
+     console.log(discount);
+      await pool.query(
+        'UPDATE products SET discount = $1 WHERE id = $2',
+        [discount, sizes[0]?.product_id] 
+      );
+    }
+    for (const sizeData of sizes) {
+      const { product_id, product_name, seller, sizee, quantity } = sizeData;
+      
+      await pool.query(
+        `INSERT INTO product_size (product_id, product_name, seller, sizee, quantity) 
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (product_id, sizee) 
+         DO UPDATE SET quantity = EXCLUDED.quantity`,
+        [product_id, product_name, seller, sizee, quantity]
+      );
+    }
+
+    res.status(200).json({ message: 'Sizes added/updated successfully' });
+  } catch (error) {
+    console.error('Error adding/updating sizes:', error);
+    res.status(500).json({ message: 'Error adding/updating sizes to database' });
+  }
+});
+
+
+app.post('/update-stock', async (req, res) => {
+  const { sizes , discount } = req.body;
+
+  try {
+    if (discount >= 0 && discount <= 100) {
+      await pool.query(
+        'UPDATE products SET discount = $1 WHERE id = $2',
+        [discount, sizes[0]?.product_id] 
+      );
+    }
+    
+    for (const sizeData of sizes) {
+      const { product_id, product_name, seller, sizee, quantity } = sizeData;
+      
+      await pool.query(
+        `INSERT INTO product_size (product_id, product_name, seller, sizee, quantity) 
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (product_id, sizee) 
+         DO UPDATE SET quantity = EXCLUDED.quantity`,
+        [product_id, product_name, seller, sizee, quantity]
+      );
+    }
+
+    res.status(200).json({ message: 'Stock updated successfully' });
+  } catch (error) {
+    console.error('Error updating stock:', error);
+    res.status(500).json({ message: 'Error updating stock in database' });
+  }
+});
+
+
+app.post('/updateDiscount', async (req, res) => {
+  const { discount, product_id } = req.body;
+
+  try {
+    if (discount >= 0 && discount <= 100) {
+      await pool.query(
+        'UPDATE products SET discount = $1 WHERE id = $2',
+        [discount, product_id] 
+      );
+    }
+    
+    res.status(200).json({ message: 'discount updated successfully' });
+  } catch (error) {
+    console.error('Error updating discount', error);
+    res.status(500).json({ message: 'Error updating discount in database' });
   }
 });
