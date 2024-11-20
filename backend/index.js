@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 const pool = new Pool({
     host: 'localhost',
     user: 'postgres',
-    password: 'abcd12',
+    password: 'Ummnny947',
     port: '5432',
     database: 'ecom1'
 });
@@ -569,5 +569,25 @@ app.post('/updateDiscount', async (req, res) => {
   } catch (error) {
     console.error('Error updating discount', error);
     res.status(500).json({ message: 'Error updating discount in database' });
+  }
+});
+
+app.get("/api/products/:id", async (req, res) => {
+  const { id } = req.params;
+
+  // Validate ID
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ error: "Invalid product ID" });
+  }
+
+  try {
+    const product = await db.query("SELECT * FROM products WHERE id = $1", [id]);
+    if (product.rows.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.json(product.rows[0]);
+  } catch (error) {
+    console.error("Error fetching product details:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
