@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    background-color: rgb(253, 238, 241); /* Full-page pink background */
+    font-family: Arial, sans-serif;
+}
+
+
+
+
+.product-details-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh; /* Full height for the container */
+    background-color: rgba(237, 223, 230, 0.947); /* Light pink */
+}
+
+/* Product Header */
+.product-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.product-header h1 {
+    color: #5a005a;
+    font-size: 2.5rem; /* Bigger font for the title */
+}
+
+/* Layout for Image and Details */
+.product-content {
+    display: flex;
+    flex-direction: row; /* Image and details side by side */
+    justify-content: center; /* Centered horizontally */
+    align-items: flex-start; /* Align at the top */
+    gap: 20px; /* Space between the image and details */
+    width: 100%; /* Full width */
+    max-width: 1200px; /* Center container within a max width */
+}
+
+/* Product Image */
+.product-image {
+    flex: 1; /* Take up equal space */
+    max-width: 500px; /* Limit the width of the image */
+}
+
+.product-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Product Info Box */
+.product-info {
+    flex: 1; /* Take up equal space */
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    text-align: left; /* Align text to the left */
+}
+
+.product-info h3 {
+    color: #5a005a;
+    margin-bottom: 10px;
+    text-align: left; /* Align text to the left */
+}
+
+.product-info p {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    margin-top: 15px;
+}
+
+.button-group button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    background-color: #5a005a; /* Purple button */
+}
+
+.button-group button:hover {
+    background-color: #720072; /* Darker purple on hover */
+}
+
+
+
+
+
+
+
+
+
