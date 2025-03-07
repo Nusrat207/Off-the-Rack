@@ -112,9 +112,11 @@ const Sign_log = () => {
             });
 
             if (response.data.success) {
-                alert('Signup successful!');
+                alert('Signup successful! Now pls login.');
 
-                navigate("/login");
+                //localStorage.setItem('user_mail', email);
+    
+                navigate("/");
             } else {
                 alert('Signup failed. Please try again.');
             }
