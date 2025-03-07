@@ -4,7 +4,7 @@ import Navbar from './navbar'
 import Footerr from './Footerr'
 import { Link, useNavigate } from 'react-router-dom';
 import './shopp.css'
-
+import Banner1 from './img/banner1.jpg'
 import './nav.css'
 import Bag from './img/bag.png'
 import Cart from './img/cartt.png'
@@ -60,22 +60,23 @@ export default function Shop_header() {
         <div>
             <div className="navbar-container">
 
-            <div className="logo" style={{paddingRight:'0px'}}>
-                <img src={Logoo} style={{ height: '40px' }} alt="settings" />
-            </div>
-                <div style={{paddingRight:'20px', paddingLeft:'140px', 
+                <div className="logo" style={{ paddingRight: '0px' }}>
+                    <img src={Logoo} style={{ height: '40px' }} alt="settings" />
+                </div>
+                <div style={{
+                    paddingRight: '20px', paddingLeft: '140px',
                 }}>
-                <div className="searchbar">
-                    <input placeholder="⌕  Search.." id="input" className="searchbar_in" name="text" type="text" />
+                    <div className="searchbar">
+                        <input placeholder="⌕  Search.." id="input" className="searchbar_in" name="text" type="text" />
 
+                    </div>
                 </div>
-                </div>
-                
+
                 <div className="nav-links">
                     <Link to="/home">  <img src={Home} style={{ width: '22px' }} alt="home" />  Home</Link>
                     <Link to="/shop"> <img src={Bag} style={{ width: '22px' }} alt="Shopping Bag" />
                         Shop</Link>
-                    <Link to="/c"><img src={Cart} style={{ width: '23px' }} alt="cart" /> Cart</Link>
+                    <Link to="/cart"><img src={Cart} style={{ width: '23px' }} alt="cart" /> Cart</Link>
                     {authToken ? (
                         <>
                             <div className="dropdown">
@@ -89,7 +90,7 @@ export default function Shop_header() {
                                     <ul className="dropdown-content">
                                         <li><Link to="/myProfile"> <img src={User} style={{ width: '24px' }} alt="user" />  My profile</Link></li>
                                         <li><Link to="/edit-profile"> <img src={Edit} style={{ width: '24px' }} alt="edit" />  Edit profile</Link></li>
-                                        <li><Link to="/order-tracking"> <img src={Order} style={{ width: '24px' }} alt="order" />  Order tracking</Link></li>
+                                        <li><Link to="/myOrders"> <img src={Order} style={{ width: '24px' }} alt="order" />  Order history</Link></li>
                                         <li><Link to="/wishlist"> <img src={Wish} style={{ width: '24px' }} alt="order" /> Wishlist/Favorites</Link></li>
                                         <li><Link onClick={handleLogout} to="/"> <img src={Logout} style={{ width: '24px' }} alt="order" /> Log out</Link></li>
                                     </ul>
@@ -105,32 +106,32 @@ export default function Shop_header() {
 
                 </div>
                 {authToken ? (<>
-            </>) : (<>
+                </>) : (<>
 
-          
 
-                <Link
-                    to="/sellerAcc"
-                    style={{
-                        color: 'black',
-                        textDecoration: 'none',
-                        border: '1px solid black',
-                        padding: '2px 2px',
-                        borderRadius: '3px',
-                        transition: 'color 0.2s, textDecoration 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.color = 'blue';
-                        e.target.style.textDecoration = 'underline';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = 'black';
-                        e.target.style.textDecoration = 'none';
-                    }}
-                >
-                    Join as Seller
-                </Link>
-            </>)}
+
+                    <Link
+                        to="/sellerAcc"
+                        style={{
+                            color: 'black',
+                            textDecoration: 'none',
+                            border: '1px solid black',
+                            padding: '2px 2px',
+                            borderRadius: '3px',
+                            transition: 'color 0.2s, textDecoration 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.color = 'blue';
+                            e.target.style.textDecoration = 'underline';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.color = 'black';
+                            e.target.style.textDecoration = 'none';
+                        }}
+                    >
+                        Join as Seller
+                    </Link>
+                </>)}
             </div>
 
 
@@ -168,13 +169,25 @@ export default function Shop_header() {
                                         fontWeight: 'bold'
                                     }}>
 
-                                        {categories[category].map((subCategory) => (
+                                        {/*      {categories[category].map((subCategory) => (
                                             <li key={subCategory} className='sub' style={{ padding: '5px 10px', borderBottom: '0.5px solid #e6e6e6' }}> 
                                             <Link className='lilink' to={`/shop/${subCategory}`} 
                                             onClick={() => localStorage.setItem('current_subcat', subCategory)}
                                             > {subCategory} </Link></li>
 
+                                        ))}  */}
+                                        {categories[category].map((subCategory) => (
+                                            <li key={subCategory} className="sub" style={{ padding: '5px 10px', borderBottom: '0.5px solid #e6e6e6' }}>
+                                                <Link
+                                                    className="lilink"
+                                                    to={`/shop/${subCategory}`} // URL that matches with the route defined in App.js
+                                                    onClick={() => localStorage.setItem('current_subcat', subCategory)}
+                                                >
+                                                    {subCategory}
+                                                </Link>
+                                            </li>
                                         ))}
+
                                     </ul>
                                 )}
                             </li>
@@ -190,13 +203,13 @@ export default function Shop_header() {
                         </ol>
                         <div className="carousel-inner">
                             <div className="carousel-item active">
-                                <img className="d-block w-100" src="https://via.placeholder.com/800x400" alt="First slide" />
+                                <img className="d-block w-100" src={Banner1} alt="First slide" />
                             </div>
                             <div className="carousel-item">
-                                <img className="d-block w-100" src="https://via.placeholder.com/800x400" alt="Second slide" />
+                                <img className="d-block w-100"  src={Banner1}  alt="Second slide" />
                             </div>
                             <div className="carousel-item">
-                                <img className="d-block w-100" src="https://via.placeholder.com/800x400" alt="Third slide" />
+                                <img className="d-block w-100"  src={Banner1}  alt="Third slide" />
                             </div>
                         </div>
                         <a className="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -210,7 +223,7 @@ export default function Shop_header() {
                     </div>
                 </div>
             </div>
-            
+
         </div>
     )
 }
