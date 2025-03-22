@@ -60,7 +60,7 @@ export default function Seller_Menu() {
                             <li style={{ paddingBottom: '6px' }}><Link to="/Products"> <img src={Products} style={{ width: '26px', paddingRight: '7px' }} /> Products</Link></li>
                             <li style={{ paddingBottom: '6px' }}><Link to="/addItem">  <img src={Add} style={{ width: '26px', paddingRight: '7px' }} /> Add Products</Link></li>
                             <li style={{ paddingBottom: '6px' }}><Link to="/seller_order">  <img src={Order} style={{ width: '26px', paddingRight: '7px' }} /> Orders</Link></li>
-                            <li style={{ paddingBottom: '6px' }}><Link to="/sell_review">  <img src={Review} style={{ width: '26px', paddingRight: '7px' }} /> Reviews</Link></li>
+                            <li style={{ paddingBottom: '6px' }}><Link to="/seller_review">  <img src={Review} style={{ width: '26px', paddingRight: '7px' }} /> Reviews</Link></li>
 
                             <li style={{ paddingBottom: '6px' }}><Link onClick={handleLogout} to="/sellerAcc">  <img src={Logout} style={{ width: '29px', paddingRight: '4px' }} /> Logout</Link></li>
 

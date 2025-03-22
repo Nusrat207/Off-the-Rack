@@ -282,11 +282,12 @@
   }
   
   .product-image {
-    height: 180px;
+    height: 190px;
+    object-fit: cover;
     cursor: pointer;
   }
   
-  .product-details-modal {
+  .seller-product-details-modal {
     width: 40%;
     position: fixed;
     top: 50%;
@@ -306,7 +307,7 @@
   
   .size-stock-table th,
   .size-stock-table td {
-    padding: 8px;
+    padding: 2px;
     border: 1px solid #570232;
     text-align: center;
   }
@@ -328,7 +329,7 @@
   }
   
 
-.close-modal,
+.seller-close-modal,
 .close-image-modal {
   display: inline-block;
   margin-top: 0px;
