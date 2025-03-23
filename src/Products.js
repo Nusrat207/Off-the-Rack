@@ -13,13 +13,13 @@ const Products = () => {
   const [isAddNewSizeSelected, setIsAddNewSizeSelected] = useState(false);
   const [isUpdateStockSelected, setIsUpdateStockSelected] = useState(false);
   const [newSizes, setNewSizes] = useState([]);
-  const [updatedDiscount, setUpdatedDiscount] = useState('');
+  const [updatedDiscount, setUpdatedDiscount] = useState(0);
 
   const categories = {
     Clothes: ["T-shirt", "One Piece", "Three Piece", "Pant"],
     Jewellery: ["Ring", "Earring", "Necklace", "Bracelet"],
     Footwear: ["Sandal", "Heels", "Sneakers"],
-    Bags: ["Bagpack", "Handbag"],
+    Bags: ["Backpack", "Handbag"],
   };
 
   const sizeOptions = {
@@ -49,10 +49,12 @@ const Products = () => {
           /* const response = await axios.get(
              `/seller_products?category=${selectedCategory}&subcategory=${selectedSubCategory}`
            ); */
+          const shop_name = localStorage.getItem('seller_name');
           const response = await axios.get('http://localhost:5000/seller_products', {
             params: {
               category: selectedCategory,
-              subcategory: selectedSubCategory
+              subcategory: selectedSubCategory,
+              shop_name: shop_name
             },
           });
 
@@ -95,6 +97,12 @@ const Products = () => {
 
   const handleDiscountChange = (e) => {
     setUpdatedDiscount(e.target.value);
+    const newDiscount = e.target.value;
+  if (newDiscount === "" || newDiscount === undefined || newDiscount ===0) {
+    setUpdatedDiscount(viewDetailsProduct.discount); 
+  } else {
+    setUpdatedDiscount(e.target.value);
+  }
   };
   
 
@@ -144,7 +152,7 @@ const Products = () => {
     const sellerName = localStorage.getItem("seller_name");
 
     const productId = viewDetailsProduct.id;
-
+   
     if (isAddNewSizeSelected) {
       const dataToSend = newSizes.map(sizeData => ({
         seller: sellerName,
@@ -153,7 +161,9 @@ const Products = () => {
         sizee: sizeData.size,
         quantity: sizeData.qty
       }));
-
+      if (updatedDiscount === "" || updatedDiscount=== undefined || updatedDiscount===0) {
+        setUpdatedDiscount(viewDetailsProduct.discount); 
+      }
       try {
         const response = await axios.post('http://localhost:5000/add-sizes', {
           sizes: dataToSend,
@@ -186,7 +196,9 @@ const Products = () => {
         }
         return null;
       }).filter(item => item !== null);
-    
+      if (updatedDiscount === "" || updatedDiscount === undefined || updatedDiscount ===0) {
+        setUpdatedDiscount(viewDetailsProduct.discount); 
+      }
       try {
         const response = await axios.post('http://localhost:5000/update-stock', {
           sizes: dataToSend,
@@ -313,9 +325,13 @@ const Products = () => {
 
         {viewDetailsProduct && (
 
-          <div className="product-details-modal" style={{ overflowY: "scroll", maxHeight: "80vh" }}>
+          <div className="seller-product-details-modal" style={{ overflowY: "scroll", maxHeight: "80vh" }}>
             <h4> {viewDetailsProduct.product_name}
-           <span style={{paddingLeft:'376px'}}> <button className="close-modal" onClick={closeDetailsModal}>
+           <span style={{paddingLeft:'376px'}}> 
+            
+            <button style={{ float: 'right', background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer',
+
+            }} className="seller-close-modal" onClick={closeDetailsModal}>
               X
             </button></span>
 
@@ -361,6 +377,7 @@ const Products = () => {
                   placeholder="new discount"
                   min="0"
                   max="100"
+                  defaultValue={viewDetailsProduct.discount}
                   style={{ padding: "5px", width: "150px" }}
                    onChange={handleDiscountChange}
                 />

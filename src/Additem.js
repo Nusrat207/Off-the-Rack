@@ -3,6 +3,8 @@ import Seller_Home from './Seller_nav_side';
 import Add from './img/add2.svg';
 import './additem.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import ImageUpload from './ImgUpload';
 
 export default function Additem() {
     const [formData, setFormData] = useState({
@@ -13,6 +15,7 @@ export default function Additem() {
         sizee: [],
         color: '',
         quantity: [],
+        discount: '',
         descrip: '',
         img: '',
         brand: ''
@@ -49,9 +52,9 @@ export default function Additem() {
         const selectedCategory = e.target.value;
         setCategory(selectedCategory);
         setSubcategories(categories[selectedCategory] || []);
-        setFormData({ ...formData, category: selectedCategory, sizee: [], quantity: [] }); 
+        setFormData({ ...formData, category: selectedCategory, sizee: [], quantity: [] });
         setSizeDisabled(selectedCategory === 'bags' || selectedCategory === 'jewellery');
-        setSizes(selectedCategory === 'bags' || selectedCategory === 'jewellery' ? [] : []); 
+        setSizes(selectedCategory === 'bags' || selectedCategory === 'jewellery' ? [] : []);
     };
 
     const handleSubcategoryChange = (e) => {
@@ -108,19 +111,61 @@ export default function Additem() {
     };
 
 
+    const [image, setImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState('');
+    const [previewUrl, setPreviewUrl] = useState('');
+
+    const handleImageChange = (e) => {
+        e.preventDefault();
+        const file = e.target.files[0];
+        setImage(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPreviewUrl(reader.result);
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+        //handleUpload();
+    };
+
+    const handleUpload = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('image', image);
+
+        try {
+            const response = await axios.post('http://localhost:5000/uploadimg', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setImageUrl(response.data.imageUrl);
+            console.log('Image uploaded:', response.data.imageUrl);
+            localStorage.setItem('imgURL', response.data.imageUrl);
+            //alert("img uploaded!");
+        } catch (error) {
+            console.error('Error uploading image:', error);
+        }
+    };
+
+
+    const navigate = useNavigate();
     const handleAdd = async (e) => {
         e.preventDefault();
 
         const seller_email = localStorage.getItem('seller_mail');
-
+        const img = localStorage.getItem('imgURL');
 
         const productData = {
             product_name: formData.product_name,
             category: formData.category,
             subcategory: formData.subcategory,
             base_price: formData.price,
-            img: formData.img,
+            img: img,
             seller: seller_email,
+            discount: formData.discount,
             descrip: formData.descrip,
             color: formData.color,
             sizee: formData.sizee,
@@ -134,13 +179,13 @@ export default function Additem() {
 
             if (response.status === 200) {
                 alert('Product and sizes added successfully!');
+                navigate('/Products')
             }
         } catch (error) {
             console.error('There was an error adding the product!', error);
             alert('Failed to add product. Please try again.');
         }
     };
-
 
 
     return (
@@ -265,6 +310,19 @@ export default function Additem() {
                                     onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                                 />
                             </div>
+                            <div className="addform_group">
+                                <label className="addsub_title" htmlFor="discount">Discount</label>
+                                <input
+                                    placeholder="Enter discount (0-100)"
+                                    className="addform_style"
+                                    type="number"
+                                    id="discount"
+                                    value={formData.discount}
+                                    onChange={handleChange}
+                                    min="0"
+                                    max="100"
+                                />
+                            </div>
 
 
                             <div className="addform_group">
@@ -272,11 +330,26 @@ export default function Additem() {
                                 <input placeholder="product description or any specification you want to mention" className="addform_style" type="text" id="descrip" value={formData.descrip}
                                     onChange={handleChange} />
                             </div>
-                            <div className="addform_group">
+                            {/*     <div className="addform_group">
                                 <label className="addsub_title" htmlFor="img">Image URL</label>
                                
                                 <input placeholder="paste the direct link of Image URL here" className="addform_style" type="text" id="img" value={formData.img} onChange={handleChange} />
                                 <label style={{color:'gray', fontSize:'14px', paddingLeft:'6px'}}>u may use postimages.org to upload img</label>
+                            </div> */}
+
+                            <div className="addform_group">
+                                <label className="addsub_title">Image</label>
+                                <input type="file" onChange={handleImageChange} />
+                                <div style={{ paddingTop: '8px' }}>
+                                    <button style={{ fontSize: '14px', fontWeight: 'bold', border: '2px solid black', padding: '2px 2px' }} onClick={handleUpload}>Upload</button>
+                                    <label style={{ paddingLeft: '5px', fontSize: '13px', opacity: '0.75', fontStyle: 'italic' }}>Wait for a few seconds for it to load please</label>
+                                </div>
+                                {imageUrl && (
+                                    <div>
+
+                                        <img src={imageUrl} alt="Uploaded" style={{ width: '150px' }} />
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ marginLeft: '150px' }}>

@@ -49,7 +49,7 @@ export default function () {
                 <Link to="/home">  <img src={Home} style={{ width: '22px' }} alt="home" />  Home</Link>
                 <Link to="/shop"> <img src={Bag} style={{ width: '22px' }} alt="Shopping Bag" />
                     Shop</Link>
-                <Link to="/c"><img src={Cart} style={{ width: '23px' }} alt="cart" /> Cart</Link>
+                <Link to="/cart"><img src={Cart} style={{ width: '23px' }} alt="cart" /> Cart</Link>
                 {authToken ? (
                     <>
                         <div className="dropdown">
@@ -64,7 +64,7 @@ export default function () {
                                 <ul className="dropdown-content">
                                     <li><Link to="/myProfile"> <img src={User} style={{ width: '24px' }} alt="user" />  My profile</Link></li>
                                     <li><Link to="/edit-profile"> <img src={Edit} style={{ width: '24px' }} alt="edit" />  Edit profile</Link></li>
-                                    <li><Link to="/order-tracking"> <img src={Order} style={{ width: '24px' }} alt="order" />  Order tracking</Link></li>
+                                    <li><Link to="/myOrders"> <img src={Order} style={{ width: '24px' }} alt="order" />  Order history</Link></li>
                                     <li><Link to="/wishlist"> <img src={Wish} style={{ width: '24px' }} alt="order" /> Wishlist/Favorites</Link></li>
                                     <li><Link onClick={handleLogout} to="/"> <img src={Logout} style={{ width: '24px' }} alt="order" /> Log out</Link></li>
                                 </ul>
