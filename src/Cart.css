@@ -1,0 +1,75 @@
+/* Cart Page Styles */
+.cart-page-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .cart-table {
+    width: 100%;
+    max-width: 1200px; 
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+  }
+  
+  .cart-table th, .cart-table td {
+    border: 1px solid #ddd;
+    padding: 12px 20px; 
+    text-align: left;
+  }
+  
+  .cart-table th {
+    background-color: #f4f4f4;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .cart-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .cart-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .cart-table td img {
+    width: 110px;
+ 
+    object-fit: cover;
+  }
+  
+  .cart-page-container button {
+    padding: 9px 15px;
+    background-color: #96064e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight:500;
+  
+  }
+
+  .cart-page-container button:hover {
+    background-color: #bb0f65;
+  }
+  
+  .cart-table td button {
+    padding: 4px 12px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cart-table td button:hover {
+    background-color: #d32f2f;
+  }
+  
