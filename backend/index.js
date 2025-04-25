@@ -742,9 +742,9 @@ app.get('/productByCat', async (req, res) => {
   let { subcategory } = req.query;
 
   try {
-    // Normalize subcategory: replace hyphens with spaces and trim
+    // Use subcategory as is without replacing hyphens to preserve correct subcategory names like "T-shirt"
     if (subcategory) {
-      subcategory = subcategory.replace(/-/g, ' ').trim();
+      subcategory = subcategory.trim();
     }
 
     const result = await pool.query(
