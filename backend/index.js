@@ -739,11 +739,16 @@ app.post('/checkoutt', async (req, res) => {
 
 
 app.get('/productByCat', async (req, res) => {
-  const { subcategory } = req.query;
+  let { subcategory } = req.query;
 
   try {
+    // Normalize subcategory: replace hyphens with spaces and trim
+    if (subcategory) {
+      subcategory = subcategory.replace(/-/g, ' ').trim();
+    }
+
     const result = await pool.query(
-      'SELECT * FROM products WHERE subcategory = $1',
+      'SELECT * FROM products WHERE subcategory ILIKE $1',
       [subcategory]
     );
 
