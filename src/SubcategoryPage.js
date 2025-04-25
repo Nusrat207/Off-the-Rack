@@ -38,8 +38,8 @@ function SubcategoryPage() {
       
       const fetchAllProducts = async () => {
         try {
-          // Normalize subCategory by replacing hyphens with spaces to match backend expectation
-          const normalizedSubCategory = subCategory ? subCategory.replace(/-/g, ' ') : '';
+          // Use subCategory as is without replacing hyphens to preserve correct subcategory names like "T-shirt"
+          const normalizedSubCategory = subCategory ? subCategory : '';
           const response = await axios.get(`http://localhost:5000/productByCat?subcategory=${normalizedSubCategory}`);
   
           const productsData = response.data.products;
@@ -73,8 +73,8 @@ function SubcategoryPage() {
     useEffect(() => {
       const fetchAllProducts = async () => {
         try {
-          // Normalize subCategory by replacing hyphens with spaces to match backend expectation
-          const normalizedSubCategory = subCategory ? subCategory.replace(/-/g, ' ') : '';
+          // Use subCategory as is without replacing hyphens to preserve correct subcategory names like "T-shirt"
+          const normalizedSubCategory = subCategory ? subCategory : '';
           const response = await axios.get(`http://localhost:5000/productByCat?subcategory=${normalizedSubCategory}`);
 
           const productsData = response.data.products;
