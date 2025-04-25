@@ -34,12 +34,13 @@ function SubcategoryPage() {
     const handleSearchChange = (e) => {
       setSearchQuery(e.target.value);
     };
-    const subcategory = location.pathname.split('/').pop();  
     useEffect(() => {
       
       const fetchAllProducts = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/productByCat?subcategory=${subCategory}`);
+          // Normalize subCategory by replacing hyphens with spaces to match backend expectation
+          const normalizedSubCategory = subCategory ? subCategory.replace(/-/g, ' ') : '';
+          const response = await axios.get(`http://localhost:5000/productByCat?subcategory=${normalizedSubCategory}`);
   
           const productsData = response.data.products;
           const productSizeData = response.data.product_size_qty;
@@ -65,12 +66,44 @@ function SubcategoryPage() {
         } catch (error) {
           console.error('Error fetching all products:', error);
         }
-        if (subcategory) {
-            fetchAllProducts();
-          }
       };
       fetchAllProducts();
-    }, []);
+    }, [subCategory]);
+
+    useEffect(() => {
+      const fetchAllProducts = async () => {
+        try {
+          // Normalize subCategory by replacing hyphens with spaces to match backend expectation
+          const normalizedSubCategory = subCategory ? subCategory.replace(/-/g, ' ') : '';
+          const response = await axios.get(`http://localhost:5000/productByCat?subcategory=${normalizedSubCategory}`);
+
+          const productsData = response.data.products;
+          const productSizeData = response.data.product_size_qty;
+
+          const updatedProducts = productsData.map(product => {
+
+            const sizeQty = productSizeData
+              .filter(item => {
+
+                return parseInt(item.product_id) === product.id;
+              })
+              .map(item => ({ size: item.sizee, quantity: item.quantity }));
+            return {
+              ...product,
+              size_qty: sizeQty,
+            };
+          });
+
+          setProducts(updatedProducts);
+          setFilteredProducts(updatedProducts);
+          console.log("Fetched Products on location change:", updatedProducts);
+
+        } catch (error) {
+          console.error('Error fetching all products on location change:', error);
+        }
+      };
+      fetchAllProducts();
+    }, [location.pathname]);
   
     useEffect(() => {
       const lowerCaseQuery = searchQuery.toLowerCase();
@@ -109,7 +142,7 @@ function SubcategoryPage() {
     };
     const [hoveredCategory, setHoveredCategory] = useState(null);
     const categories = {
-      Clothes: ['T-Shirt', 'One Piece', 'Three Piece', 'Pant'],
+      Clothes: ['T-shirt', 'One Piece', 'Three Piece', 'Pant'],
       Jewellery: ['Ring', 'Earring', 'Necklace', 'Bracelet'],
       Footwear: ['Sandal', 'Heels', 'Sneakers'],
       Bags: ['Backpack', 'Handbag'],
@@ -180,7 +213,9 @@ function SubcategoryPage() {
  
  
    const handleReset = () => {
-       setFilteredProducts([]);
+       setFilteredProducts(products);
+       setSelectedBrands([]);
+       setSelectedColors([]);
        setMinPrice('');
        setMaxPrice('');
      
