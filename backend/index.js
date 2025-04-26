@@ -766,8 +766,95 @@ app.get('/productByCat', async (req, res) => {
   }
 });
 
-
 app.post("/checkout", async (req, res) => {
+  const { cartItems, customerDetails } = req.body;
+
+  if (!cartItems || !customerDetails) {
+    return res.status(400).json({ error: "Cart items and customer details are required" });
+  }
+
+  try {
+    const order_id = Math.random().toString(36).substring(2, 10).toLowerCase();
+    const bdTimeOffset = 6 * 60 * 60 * 1000; 
+    const order_time = new Date(Date.now() + bdTimeOffset)
+      .toISOString()
+      .replace("T", " ")
+      .split(".")[0];
+
+    await pool.query("BEGIN");
+
+  
+    for (const item of cartItems) {
+      const stockQuery = await pool.query(
+        `SELECT quantity FROM product_size WHERE product_id = $1 AND sizee = $2`,
+        [item.product_id, item.sizee]
+      );
+
+      if (stockQuery.rowCount === 0) {
+        await pool.query("ROLLBACK");
+        return res.status(400).json({
+          error: `Product ${item.product_name} (Size: ${item.sizee}) is no longer available. Please remove the item from your cart and proceed to checkout.`,
+        });
+      }
+
+      const currentStock = Number(stockQuery.rows[0].quantity);
+
+      if (item.quantity > currentStock) {
+        await pool.query("ROLLBACK");
+        return res.status(400).json({
+          error: `Only ${currentStock} unit(s) left for ${item.product_name} (Size: ${item.sizee}). Please remove the item from your cart and proceed to checkout.`,
+        });
+      }
+    }
+
+   
+    const deliveryInfoQuery = `
+      INSERT INTO delivery_info (order_id, fullName, phone, address, payment, trxID)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
+    await pool.query(deliveryInfoQuery, [
+      order_id,
+      customerDetails.fullName,
+      customerDetails.phoneNumber,
+      customerDetails.address,
+      customerDetails.paymentMethod,
+      customerDetails.trxId || null,
+    ]);
+
+    
+    const customerOrderQuery = `
+      INSERT INTO customer_order (order_id, product_id, product_name, user_mail, sizee, quantity, price, img, seller, status, order_time)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    `;
+
+    for (const item of cartItems) {
+      await pool.query(customerOrderQuery, [
+        order_id,
+        item.product_id,
+        item.product_name,
+        item.user_mail,
+        item.sizee,
+        item.quantity,
+        item.price,
+        item.img,
+        item.seller,
+        "pending",
+        order_time,
+      ]);
+    }
+
+    await pool.query("COMMIT");
+
+    res.status(200).json({ message: "Order placed successfully", order_id });
+
+  } catch (error) {
+    console.error("Error processing checkout:", error);
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/checkoutxx", async (req, res) => {
   const { cartItems, customerDetails } = req.body;
 
   if (!cartItems || !customerDetails) {
@@ -845,6 +932,7 @@ app.post('/getNotif', async (req, res) => {
       res.status(500).send("Error fetching notifications");
   }
 });
+
 
 app.post('/removeNotif', async (req, res) => {
   const { order_id } = req.body;
@@ -971,14 +1059,56 @@ app.post('/api/orders', async (req, res) => {
 });
 
 app.post('/api/orderDetails', async (req, res) => {
-  const { order_id } = req.body;
+  const { order_id, sellerName } = req.body;
 
   if (!order_id) {
     return res.status(400).json({ error: 'Order ID is required' });
   }
 
   const productQuery = `
-    SELECT img, product_name, sizee, quantity, price 
+    SELECT *
+    FROM customer_order 
+    WHERE order_id = $1 AND seller=$2;
+  `;
+
+  const deliveryQuery = `
+    SELECT d.payment, d.phone, d.address, d.fullname
+    FROM delivery_info d
+    WHERE d.order_id = $1;
+  `;
+
+  try {
+    const productResult = await pool.query(productQuery, [order_id, sellerName]);
+    const deliveryResult = await pool.query(deliveryQuery, [order_id]);
+
+    if (productResult.rows.length === 0 || deliveryResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const totalPrice = productResult.rows.reduce((sum, row) => sum + parseFloat(row.price), 0);
+
+    res.json({
+      products: productResult.rows,
+      delivery: deliveryResult.rows[0],
+      totalPrice,
+    });
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
+
+app.post('/api/myOrderDetails', async (req, res) => {
+  const { order_id} = req.body;
+
+  if (!order_id) {
+    return res.status(400).json({ error: 'Order ID is required' });
+  }
+
+  const productQuery = `
+    SELECT *
     FROM customer_order 
     WHERE order_id = $1;
   `;
@@ -1009,6 +1139,7 @@ app.post('/api/orderDetails', async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 });
+
 
 app.post('/api/update-order-status', async (req, res) => {
   const { orderId, newStatus } = req.body;
@@ -1288,5 +1419,42 @@ app.get('/api/rates/:product_id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching ratings:', error);
     res.status(500).send('Error fetching ratings');
+  }
+});
+
+app.post('/api/remove-from-favorites', async (req, res) => {
+  const { user_mail, product_id } = req.body;
+
+  try {
+    await pool.query(
+      'DELETE FROM favorites WHERE user_mail = $1 AND product_id = $2',
+      [user_mail, product_id]
+    );
+    res.status(200).json({ message: 'Removed from favorites' });
+  } catch (error) {
+    console.error('Error in removing favorite:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+app.post('/api/cancel-product', async (req, res) => {
+  const { product_id, order_id, seller, order_time } = req.body;
+ //console.log(product_id, order_id, seller, order_time);
+  try {
+    await pool.query(
+      `UPDATE customer_order
+       SET status = 'cancelled'
+       WHERE product_id = $1 AND order_id = $2 AND seller = $3 AND order_time = $4`,
+      [product_id, order_id, seller, order_time]
+    );
+
+    //console.log("done here");
+
+    res.status(200).json({ message: 'Product cancelled.' });
+  } catch (err) {
+    console.error('Error cancelling product:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });

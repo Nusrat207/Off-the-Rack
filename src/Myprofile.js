@@ -39,9 +39,15 @@ export default function Myprofile() {
 
 
   return (
-    <div>
+    <div >
         <Navbar/>
-        <div className="card">
+        <div style={{ 
+  display: 'flex', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  height: '100vh' 
+}}>
+        <div  className="card">
       <div className="card__img">
         <img src={Bg} alt="Background" />
       </div>
@@ -55,7 +61,7 @@ export default function Myprofile() {
       <div className="card__label">Phone No.</div>
       <div className="card__info">{userData.phone}</div>
       
-    </div>
-    </div>
+    </div> </div>
+    </div> 
   )
 }

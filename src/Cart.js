@@ -12,6 +12,8 @@ import User from './img/user.png';
 import Logoo from './img/logo1.jpg';
 import Logout from './img/logout.png';
 import Edit from './img/edit.png';
+import Cod from './img/cod.png';
+import Bkash from './img/bkash.png';
 import Setting from './img/profile_settings.png';
 import axios from 'axios';
 import './Cart.css'
@@ -128,36 +130,44 @@ export default function Cart() {
 
     const handleConfirmOrder = async () => {
         setIsLoading(true);
-    
+      
         const payload = {
-            cartItems, 
-            customerDetails: {
-                fullName: formData.fullName,
-                phoneNumber: formData.phoneNumber,
-                address: formData.address,
-                paymentMethod: formData.paymentMethod,
-                trxId: formData.paymentMethod === "bkash" ? formData.trxId : null,
-            },
+          cartItems,
+          customerDetails: {
+            fullName: formData.fullName,
+            phoneNumber: formData.phoneNumber,
+            address: formData.address,
+            paymentMethod: formData.paymentMethod,
+            trxId: formData.paymentMethod === "bkash" ? formData.trxId : null,
+          },
         };
-    
+      
         try {
-            const response = await axios.post("http://localhost:5000/checkout", payload);
-    
-            if (response.status === 200) {
-                setCheckoutMessage("Order confirmed!");
-            } else {
-                setCheckoutMessage("Order confirmation failed. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error during order confirmation:", error);
-            setCheckoutMessage("An error occurred. Please try again later.");
-        } finally {
-            setIsLoading(false);
+          const response = await axios.post("http://localhost:5000/checkout", payload);
+      
+          if (response.status === 200) {
+            setCheckoutMessage("Order confirmed!");
             setIsModalOpen(false);
             navigate("/cart");
             window.location.reload();
+          } else {
+            setCheckoutMessage("Order confirmation failed. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error during order confirmation:", error);
+      
+         
+          if (error.response && error.response.data && error.response.data.error) {
+            setIsModalOpen(false);
+            alert(error.response.data.error); // show backend message (e.g. stock issue)
+          } else {
+            setCheckoutMessage("An error occurred. Please try again later.");
+          }
+        } finally {
+          setIsLoading(false);
         }
-    };
+      };
+      
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -352,6 +362,7 @@ export default function Cart() {
                             onClick={closeModal}
                         >
                             ✖
+                            
                         </button>
                         <h2 style={{ marginBottom: "15px" }}>Delivery Information</h2>
                         <input
@@ -389,6 +400,7 @@ export default function Cart() {
                                     onChange={handleInputChange}
                                 />
                                 Cash on Delivery
+                                <img src={Cod} style={{ height: '30px', paddingRight:'15px' }} alt="cod" />
                             </label>
                             <label>
                                 <input
@@ -399,6 +411,7 @@ export default function Cart() {
                                     onChange={handleInputChange}
                                 />
                                 bKash
+                                <img src={Bkash} style={{ height: '40px' }} alt="bkash" />
                             </label>
 
                         </div>

@@ -76,8 +76,9 @@ export default function ProductDetails() {
   const totalAvailableQuantity = availableSizes.reduce((total, item) => total + parseInt(item.quantity), 0);
 
   const availableQuantities = selectedSize
-    ? availableSizes.find(item => item.size === selectedSize)?.quantity || 0
-    : totalAvailableQuantity;
+    ? Number(availableSizes.find(item => item.size === selectedSize)?.quantity) || 0
+    : Number(totalAvailableQuantity);
+
 
   const handleSizeChange = (event) => {
     setSelectedSize(event.target.value);
@@ -85,9 +86,22 @@ export default function ProductDetails() {
     setSelectedQuantity(1);
   };
 
-  const handleQuantityChange = (event) => {
-    setSelectedQuantity(event.target.value);
+  //const handleQuantityChange = (event) => {
+  //  setSelectedQuantity(event.target.value);
+  // };
+  const [quantityValid, setQuantityValid] = useState(true);
+  const handleQuantityChange = (e) => {
+    const value = Number(e.target.value);
+
+    if (value > availableQuantities) {
+      setQuantityValid(false);
+    } else {
+      setQuantityValid(true);
+    }
+
+    setSelectedQuantity(value < 1 ? 1 : value);
   };
+
   const handleAddToFav = async () => {
     if (!authToken) {
       setLoginPromptVisible(true);
@@ -98,7 +112,7 @@ export default function ProductDetails() {
       alert("User email not found in local storage!");
       return;
     }
-   
+
     const seller = localStorage.getItem('seller_name');
     const favItem = {
       user_mail: userMail,
@@ -111,13 +125,31 @@ export default function ProductDetails() {
 
     try {
       const response = await axios.post('http://localhost:5000/add-to-fav', favItem);
-   
+
       alert("item added to favs!");
       window.location.reload();
     } catch (error) {
       console.error("Error adding to fav:", error);
     }
   };
+
+
+  const handleRemoveFromFav = async (productId) => {
+    const user_mail = localStorage.getItem('user_mail');
+
+    try {
+      await axios.post('http://localhost:5000/api/remove-from-favorites', {
+        user_mail,
+        product_id: productId,
+      });
+      alert("item removed from favs!");
+      window.location.reload();
+    } catch (err) {
+      console.error('Error removing from favorites:', err);
+    }
+  };
+
+
   const handleLoginRedirect = () => {
     navigate('/');
   };
@@ -133,7 +165,7 @@ export default function ProductDetails() {
       return;
     }
     const price = selectedQuantity * parseFloat(product.base_price);
-    const seller = localStorage.getItem('seller_name');
+    //const seller = localStorage.getItem('seller_name');
     const cartItem = {
       user_mail: userMail,
       product_id: product.id,
@@ -142,7 +174,7 @@ export default function ProductDetails() {
       quantity: selectedQuantity,
       img: product.img,
       price: price,
-      seller: seller,
+      seller: product.seller,
       timestamp: new Date().toISOString(),
     };
 
@@ -196,7 +228,7 @@ export default function ProductDetails() {
         console.error("Error fetching reviews:", error);
       });
   }, [product.id]);
-  
+
 
   const handleReviewChange = (e) => {
     setReviewText(e.target.value);
@@ -207,8 +239,8 @@ export default function ProductDetails() {
   };
 
   const handleSubmitReview = () => {
-  
-    const User=localStorage.getItem('user_mail');
+
+    const User = localStorage.getItem('user_mail');
     const reviewData = {
       product_id: product.id,
       seller: product.seller,
@@ -239,17 +271,17 @@ export default function ProductDetails() {
 
         const data = response.data;
 
-       
+
         data.avg_stars = data.avg_stars || 0;
 
         setRatingData(response.data);
         //const total = ratingData.star_1_count + ratingData.star_2_count + ratingData.star_3_count+ratingData.star_4_count+ratingData.star_5_count;
-        const total = 
-  parseInt(data.star_1_count, 10) +
-  parseInt(data.star_2_count, 10) +
-  parseInt(data.star_3_count, 10) +
-  parseInt(data.star_4_count, 10) +
-  parseInt(data.star_5_count, 10);
+        const total =
+          parseInt(data.star_1_count, 10) +
+          parseInt(data.star_2_count, 10) +
+          parseInt(data.star_3_count, 10) +
+          parseInt(data.star_4_count, 10) +
+          parseInt(data.star_5_count, 10);
 
         setRatingTotal(total);
       } catch (error) {
@@ -258,9 +290,16 @@ export default function ProductDetails() {
     };
 
     fetchRatings();
-    
-   
-  }, [product.id]); 
+
+
+  }, [product.id]);
+
+  const isSoldOut = isSizeRequired
+    ? availableSizes.every(item => Number(item.quantity) === 0)
+    : Number(availableQuantities) === 0;
+
+
+
 
   return (
     <div>
@@ -334,22 +373,21 @@ export default function ProductDetails() {
       <div className="product-details-container">
         <div className="product-header">
           <h2>{product.product_name}
-          <button
-  style={{ border: 'none', backgroundColor: 'transparent' }}
-  onClick={isFavorite ? null : handleAddToFav}  // Disable the click handler if already favorited
-  disabled={isFavorite}  // Disable the button if the product is favorited
->
-  <img
-    src={isFavorite ? Heart1 : Heart2}  // Show Heart1 if isFavorite is true, else Heart2
-    style={{ width: '65px', paddingLeft: '30px', paddingBottom: '5px' }}
-    alt="Favorite"
-  />
-</button>
+            <button
+              style={{ border: 'none', backgroundColor: 'transparent' }}
+              onClick={isFavorite ? () => handleRemoveFromFav(product.id) : handleAddToFav}
+            >
+              <img
+                src={isFavorite ? Heart1 : Heart2}  // Show Heart1 if isFavorite is true, else Heart2
+                style={{ width: '65px', paddingLeft: '30px', paddingBottom: '5px' }}
+                alt="Favorite"
+              />
+            </button>
 
           </h2>
-          
-            
-         
+
+
+
         </div>
         <div className="product-details-content">
           <div className="product-image">
@@ -357,7 +395,7 @@ export default function ProductDetails() {
           </div>
           <div className="product-info">
             <h3>Price: Tk {product.base_price}</h3>
-      
+
             <p><strong>Subcategory:</strong> {product.subcategory}</p>
             <p><strong>Color:</strong> {product.color}</p>
             <p><strong>Brand:</strong> {product.brand}</p>
@@ -367,110 +405,138 @@ export default function ProductDetails() {
         </div>
         <div className="button-group">
           <button onClick={() => navigate(-1)}>Back to Shop</button>
-          <button onClick={() => setModalVisible(true)}>Add to Cart</button>
+          <button
+            onClick={() => setModalVisible(true)}
+            disabled={isSoldOut}
+            style={isSoldOut ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+          >
+            Add to Cart
+          </button>
+
         </div>
+        {isSoldOut && (
+          <div style={{ paddingTop: '20px', paddingLeft: '190px' }}>
+            <button disabled
+              style={{
+                borderColor: 'red',
+                borderWidth: '2px',
+                borderStyle: 'solid',
+                padding: '10px 25px',
+                fontSize: '16px',
+
+                backgroundColor: 'white',
+                color: 'red',
+                fontWeight: 'bold', fontSize: '20px'
+              }}
+            >
+
+              SOLD OUT
+
+            </button>
+          </div>
+        )}
 
         {/* Review Section */}
-      <div className="review-section">
-        <h5 className="reviews-header"  style={{textShadow: '0.2px 0.2px 0.2pxrgb(177, 166, 166)', fontSize:'18px' }}>
-        <img src={Write} style={{width:'35px', paddingRight:'5px'}} />
-          Write a Review</h5>
-        <textarea
-          placeholder="Write your review here"
-          value={reviewText}
-          onChange={handleReviewChange}
-        ></textarea>
-        <div className="rating">
-          <span style={{fontWeight:'bold'}}>Rate this product: </span>
-          {[1, 2, 3, 4, 5].map((star) => (
-            <span
-              key={star}
-              className={`star ${rating >= star ? 'filled' : ''}`}
-              onClick={() => handleRatingChange(star)}
-            >
-              ★
-            </span>
+        <div className="review-section">
+          <h5 className="reviews-header" style={{ textShadow: '0.2px 0.2px 0.2pxrgb(177, 166, 166)', fontSize: '18px' }}>
+            <img src={Write} style={{ width: '35px', paddingRight: '5px' }} />
+            Write a Review</h5>
+          <textarea
+            placeholder="Write your review here"
+            value={reviewText}
+            onChange={handleReviewChange}
+          ></textarea>
+          <div className="rating">
+            <span style={{ fontWeight: 'bold' }}>Rate this product: </span>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`star ${rating >= star ? 'filled' : ''}`}
+                onClick={() => handleRatingChange(star)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+          <button onClick={handleSubmitReview} className="submit-review">
+            Submit
+          </button>
+        </div>
+
+
+        <div className="reviews-section">
+          <h5 className="reviews-header">
+            <img src={Review} alt="Review Icon" className="review-icon" />
+            Reviews
+          </h5>
+          <div style={styles.container}>
+            {ratingData ? (
+              <>
+
+                <div style={styles.ratingRow}>
+                  <div style={styles.avgRating}>
+                    <h1 style={styles.ratingNumber}>{ratingData.avg_stars}/5</h1>
+                    <p style={{ fontSize: '19px', fontWeight: 'bold', paddingTop: '10px' }}>{ratingTotal} Ratings</p>
+                  </div>
+                  <div style={styles.ratingBreakdown}>
+                    <div style={styles.breakdownRow}>
+                      <span style={{ color: '#fdcc0d', fontSize: '20px' }}>★★★★★
+                        <label style={{ fontSize: '20px' }}>
+                        </label></span>
+                      <span style={styles.count}> ({ratingData.star_5_count})</span>
+                    </div>
+                    <div style={styles.breakdownRow}>
+                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★★★★
+                        <label style={{ color: 'gray' }}>☆ </label>
+                      </span>
+                      <span style={styles.count}>({ratingData.star_4_count})</span>
+                    </div>
+                    <div style={styles.breakdownRow}>
+                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★★★
+                        <label style={{ color: 'gray' }}>☆☆ </label>
+
+                      </span>
+                      <span style={styles.count}>({ratingData.star_3_count})</span>
+                    </div>
+                    <div style={styles.breakdownRow}>
+                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★★
+                        <label style={{ color: 'gray' }}>☆☆☆ </label>
+
+                      </span>
+                      <span style={styles.count}>({ratingData.star_2_count})</span>
+                    </div>
+                    <div style={styles.breakdownRow}>
+                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★
+                        <label style={{ color: 'gray' }}>☆☆☆☆ </label>
+
+
+                      </span>
+                      <span style={styles.count}>({ratingData.star_1_count})</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p>Loading...</p>
+            )}
+          </div>
+
+
+          {/* REVIEWs SECTION */}
+
+          {reviews.map((review) => (
+            <div className="review" key={review.id}>
+              <h4 className="review-user">{review.userr}</h4>
+              <p className="review-date">{review.datee}</p>
+              <div className="review-rating">
+                <span className="star-rating">{'★'.repeat(Number(review.stars))}</span>
+              </div>
+              <p className="review-comment">{review.comment}</p>
+            </div>
           ))}
         </div>
-        <button onClick={handleSubmitReview} className="submit-review">
-          Submit 
-        </button>
-      </div>
 
 
-      <div className="reviews-section">
-  <h5 className="reviews-header">
-    <img src={Review} alt="Review Icon" className="review-icon" />
-    Reviews
-  </h5>
-      <div style={styles.container}>
-      {ratingData ? (
-        <>
-         
-          <div style={styles.ratingRow}>
-            <div style={styles.avgRating}>
-              <h1 style={styles.ratingNumber}>{ratingData.avg_stars}/5</h1>
-              <p style={{fontSize:'19px', fontWeight:'bold', paddingTop:'10px'}}>{ratingTotal} Ratings</p>
-            </div>
-            <div style={styles.ratingBreakdown}>
-              <div style={styles.breakdownRow}>
-                <span style={{color:'#fdcc0d', fontSize:'20px'}}>★★★★★
-                  <label style={{fontSize:'20px'}}>
-                    </label></span>
-                <span style={styles.count}> ({ratingData.star_5_count})</span>
-              </div>
-              <div style={styles.breakdownRow}>
-                <span style={{color:'#fdcc0d', fontSize:'20px'}} >★★★★ 
-                  <label style={{color:'gray'}}>☆ </label>
-                    </span>
-                <span style={styles.count}>({ratingData.star_4_count})</span>
-              </div>
-              <div style={styles.breakdownRow}>
-              <span style={{color:'#fdcc0d', fontSize:'20px'}} >★★★ 
-              <label style={{color:'gray'}}>☆☆ </label>
-                  
-                 </span>
-                <span style={styles.count}>({ratingData.star_3_count})</span>
-              </div>
-              <div style={styles.breakdownRow}>
-              <span style={{color:'#fdcc0d', fontSize:'20px'}} >★★ 
-              <label style={{color:'gray'}}>☆☆☆ </label>
-                  
-                  </span>
-                <span style={styles.count}>({ratingData.star_2_count})</span>
-              </div>
-              <div style={styles.breakdownRow}>
-              <span style={{color:'#fdcc0d', fontSize:'20px'}} >★ 
-              <label style={{color:'gray'}}>☆☆☆☆ </label>
-                  
-                  
-               </span>
-                <span style={styles.count}>({ratingData.star_1_count})</span>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
-
-      
-      {/* REVIEWs SECTION */}
-   
-  {reviews.map((review) => (
-    <div className="review" key={review.id}>
-      <h4 className="review-user">{review.userr}</h4>
-      <p className="review-date">{review.datee}</p>
-      <div className="review-rating">
-        <span className="star-rating">{'★'.repeat(Number(review.stars))}</span>
-      </div>
-      <p className="review-comment">{review.comment}</p>
-    </div>
-  ))}
-</div>
-
-  
 
         {modalVisible && (
           <div className="product-details-modal">
@@ -481,11 +547,13 @@ export default function ProductDetails() {
                   <label>Size:</label>
                   <select value={selectedSize} onChange={handleSizeChange}>
                     <option value="">Select Size</option>
-                    {availableSizes.map((item, index) => (
-                      <option key={index} value={item.size}>
-                        {item.size}
-                      </option>
-                    ))}
+                    {availableSizes
+                      .filter(item => Number(item.quantity) > 0)  // Filter out sizes with 0 qty
+                      .map((item, index) => (
+                        <option key={index} value={item.size}>
+                          {item.size}
+                        </option>
+                      ))}
                   </select>
                 </div>
               ) : (
@@ -505,8 +573,18 @@ export default function ProductDetails() {
               </div>
               <div className="modal-buttons">
                 <button onClick={() => setModalVisible(false)}>Cancel</button>
-                <button onClick={handleAddToCart}>Add</button>
-              </div>
+                <button onClick={handleAddToCart}
+                  disabled={!quantityValid || selectedQuantity < 1}
+                  style={
+                    !quantityValid ? { opacity: 0.5, cursor: 'not-allowed' } : {}
+                  }
+
+                >Add</button>
+              </div> {!quantityValid && (
+                <p style={{ color: 'red', marginTop: '5px', fontSize: '14px' }}>
+                  Only {availableQuantities} item(s) in stock for the selected size.
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -535,7 +613,7 @@ const styles = {
     margin: "0 auto",
     textAlign: "center",
     fontFamily: "Arial, sans-serif",
-  
+
   },
   heading: {
     fontSize: "24px",
@@ -562,17 +640,17 @@ const styles = {
   },
   breakdownRow: {
     display: "flex",
-    
+
     marginBottom: "10px",
   },
   count: {
     fontWeight: "500",
-    fontSize:'17px',
-    paddingTop:'3px',
-    paddingLeft:'20px'
-   
+    fontSize: '17px',
+    paddingTop: '3px',
+    paddingLeft: '20px'
+
   },
-}; 
+};
 /*
   
 {/* ratings 

@@ -183,7 +183,22 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM order_notif WHERE order_id = NEW.order_id
     ) THEN
-        INSERT INTO ordernoti_f (order_id, seller, order_time, status)
+        INSERT INTO order_notif (order_id, seller, order_time, status)
+        VALUES (NEW.order_id, NEW.seller, NEW.order_time, 'not checked');
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_order_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM order_notif 
+        WHERE order_id = NEW.order_id AND seller = NEW.seller
+    ) THEN
+        INSERT INTO order_notif (order_id, seller, order_time, status)
         VALUES (NEW.order_id, NEW.seller, NEW.order_time, 'not checked');
     END IF;
     RETURN NEW;
