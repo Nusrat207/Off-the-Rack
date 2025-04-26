@@ -6,6 +6,8 @@ import Footerr from './Footerr';
 import Shop_header from './Shop_header';
 import { Link, useNavigate } from 'react-router-dom';
 import Banner1 from './img/banner1.jpg'
+import Banner2 from './img/banner2.png'
+import Banner3 from './img/banner3.png'
 import './nav.css'
 import Bag from './img/bag.png'
 import Cart from './img/cartt.png'
@@ -342,10 +344,10 @@ export default function Shop() {
                   <img className="d-block w-100" src={Banner1} style={{height:'540px', objectFit:'contain'}} alt="First slide" />
                 </div>
                 <div className="carousel-item">
-                  <img className="d-block w-100" src={Banner1} style={{height:'540px', objectFit:'contain'}}  alt="Second slide" />
+                  <img className="d-block w-100" src={Banner2} style={{height:'540px', objectFit:'contain'}}  alt="Second slide" />
                 </div>
                 <div className="carousel-item">
-                  <img className="d-block w-100" src={Banner1} style={{height:'540px', objectFit:'contain'}}  alt="Third slide" />
+                  <img className="d-block w-100" src={Banner3} style={{height:'540px', objectFit:'contain'}}  alt="Third slide" />
                 </div>
               </div>
               <a className="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
