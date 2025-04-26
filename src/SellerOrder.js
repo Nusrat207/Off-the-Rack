@@ -6,10 +6,10 @@ export default function SellerOrder() {
   const [orders, setOrders] = useState([]);
   const [details, setDetails] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  
   useEffect(() => {
+    
     const sellerName = localStorage.getItem('seller_name');
-
     if (sellerName) {
       axios
         .post('http://localhost:5000/api/sellerOrders', { seller: sellerName })
@@ -23,8 +23,9 @@ export default function SellerOrder() {
   }, []);
 
   const handleViewDetails = (order_id) => {
+    const sellerName = localStorage.getItem('seller_name');
     axios
-      .post('http://localhost:5000/api/orderDetails', { order_id })
+      .post('http://localhost:5000/api/orderDetails', { order_id, sellerName  })
       .then((response) => {
         setDetails(response.data);
         setShowModal(true);
@@ -117,6 +118,31 @@ export default function SellerOrder() {
     return new Date(dateString).toLocaleDateString("en-GB", options);
   };
 
+  const handleCancelProduct = async (product) => {
+    const confirmCancel = window.confirm(`Are you sure you want to cancel "${product.product_name}"?`);
+    if (!confirmCancel) return;
+  
+    console.log(product);
+    try {
+      const response = await axios.post('http://localhost:5000/api/cancel-product', {
+        product_id: product.product_id,
+        order_id: product.order_id,
+        seller: product.seller,
+        order_time: product.order_time,
+      });
+
+      
+  
+      alert('Product cancelled successfully!');
+      // Optionally refresh the modal data or reload
+      window.location.reload();
+    } catch (error) {
+      console.error('Error cancelling product:', error);
+      alert('Failed to cancel product.');
+    }
+  };
+  
+
   return (
     <div> <Seller_Menu />
       <div style={{ paddingTop: '90px' }}>
@@ -151,9 +177,11 @@ export default function SellerOrder() {
                           backgroundColor: 'white',
                           color: order.status === 'pending' ? 'red' :
                             order.status === 'shipped' ? '#e6a902' :
+                            order.status === 'cancelled' ? '#6a6a6b' :
                               'green',
                           border: `2px solid ${order.status === 'pending' ? 'red' :
                             order.status === 'shipped' ? '#e6a902' :
+                            order.status === 'cancelled' ? '#6a6a6b':
                               'green'}`,
                           borderRadius: '5px',
                           padding: '5px 10px',
@@ -181,7 +209,7 @@ export default function SellerOrder() {
                             overflow: 'hidden',
                           }}
                         >
-                          {['pending', 'shipped', 'completed']
+                          {['pending', 'shipped', 'completed', 'cancelled']
                             .filter((statusOption) => statusOption !== order.status)
                             .map((statusOption) => (
                               <div
@@ -192,9 +220,11 @@ export default function SellerOrder() {
                                   backgroundColor: 'white',
                                   color: statusOption === 'pending' ? 'red' :
                                     statusOption === 'shipped' ? '#e6a902' :
+                                    statusOption === 'cancelled' ? '#565657' :
                                       'green',
                                   border: `2px solid ${statusOption === 'pending' ? 'red' :
                                     statusOption === 'shipped' ? '#e6a902' :
+                                    statusOption === 'cancelled' ? '#565657' :
                                       'green'}`,
                                   cursor: 'pointer',
                                   textAlign: 'center',
@@ -234,19 +264,42 @@ export default function SellerOrder() {
                     <th style={cellStyle}>Price</th>
                   </tr>
                 </thead>
+     
+
+
                 <tbody>
-                  {details.products.map((product, index) => (
-                    <tr key={index} style={rowStyle}>
-                      <td style={cellStyle}>
-                        <img src={product.img} alt="Product" width="50" />
-                      </td>
-                      <td style={cellStyle}>{product.product_name}</td>
-                      <td style={cellStyle}>{product.sizee}</td>
-                      <td style={cellStyle}>{product.quantity}</td>
-                      <td style={cellStyle}>৳ {product.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
+  {details.products.map((product, index) => (
+    <tr 
+      key={index}
+      style={{
+        ...rowStyle,
+        opacity: product.status === 'cancelled' ? 0.5 : 1,
+        pointerEvents: product.status === 'cancelled' ? 'none' : 'auto'
+      }}
+    >
+      <td style={cellStyle}>
+        <img src={product.img} alt="Product" width="50" />
+      </td>
+      <td style={cellStyle}>{product.product_name}</td>
+      <td style={cellStyle}>{product.sizee}</td>
+      <td style={cellStyle}>{product.quantity}</td>
+      <td style={cellStyle}>৳ {product.price}</td>
+      <td style={cellStyle}>
+        {product.status === 'cancelled' ? (
+          <span style={{ color: 'gray' }}>Cancelled</span>
+        ) : (
+          <button 
+          onClick={() => handleCancelProduct(product)}
+          style={{ padding: '2px 7px', backgroundColor: 'white', color: 'red', border: '1px solid red', fontSize:'12px' }}
+        >
+          Cancel
+          </button>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
               </table>
               <div style={summaryStyle}>
                 <p><strong>Total Price:</strong>৳ {details.totalPrice}</p>

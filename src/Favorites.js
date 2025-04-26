@@ -42,7 +42,7 @@ export default function Favorites() {
   return (
     <div>
         <Navbar/>
-        <div  style={{ padding: '20px', minHeight: '100vh'}}>
+        <div  style={{ padding: '10px', minHeight: '100vh'}}>
           <div className="row" style={{ display: 'flex', gap: '125px', flexWrap: 'wrap', paddingLeft:'150px' }}>
             {products.map((product) => (
               <div className="col-6 col-sm-4" key={product.id}>

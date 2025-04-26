@@ -341,13 +341,13 @@ export default function Shop() {
               </ol>
               <div className="carousel-inner" >
                 <div className="carousel-item active">
-                  <img className="d-block w-100" src={Banner1} style={{height:'540px', objectFit:'contain'}} alt="First slide" />
+                  <img className="d-block w-100" src={Banner1} style={{height:'520px', objectFit:'contain'}} alt="First slide" />
                 </div>
                 <div className="carousel-item">
-                  <img className="d-block w-100" src={Banner2} style={{height:'540px', objectFit:'contain'}}  alt="Second slide" />
+                  <img className="d-block w-100" src={Banner2} style={{height:'520px', objectFit:'contain'}}  alt="Second slide" />
                 </div>
                 <div className="carousel-item">
-                  <img className="d-block w-100" src={Banner3} style={{height:'540px', objectFit:'contain'}}  alt="Third slide" />
+                  <img className="d-block w-100" src={Banner3} style={{height:'520px', objectFit:'contain'}}  alt="Third slide" />
                 </div>
               </div>
               <a className="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">

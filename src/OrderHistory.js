@@ -26,7 +26,7 @@ export default function OrderHistory() {
   
     const handleViewDetails = (order_id) => {
       axios
-        .post('http://localhost:5000/api/orderDetails', { order_id })
+        .post('http://localhost:5000/api/myOrderDetails', { order_id })
         .then((response) => {
           setDetails(response.data);
           setShowModal(true);
@@ -134,18 +134,20 @@ export default function OrderHistory() {
   
                     <td style={cellStyle}>
                       <div style={{ position: 'relative' }}>
-                        <button
+                        <button disbaled
                           style={{
                             backgroundColor: 'white',
                             color: order.status === 'pending' ? 'red' :
                               order.status === 'shipped' ? '#e6a902' :
+                              order.status === 'cancelled' ? '#565657' :
                                 'green',
                             border: `2px solid ${order.status === 'pending' ? 'red' :
                               order.status === 'shipped' ? '#e6a902' :
+                              order.status === 'cancelled' ? '#565657' :
                                 'green'}`,
                             borderRadius: '5px',
                             padding: '5px 10px',
-                            cursor: 'pointer',
+                         
                             position: 'relative',
                             zIndex: 1,
                           }}
@@ -183,18 +185,32 @@ export default function OrderHistory() {
                     </tr>
                   </thead>
                   <tbody>
-                    {details.products.map((product, index) => (
-                      <tr key={index} style={rowStyle}>
-                        <td style={cellStyle}>
-                          <img src={product.img} alt="Product" width="50" />
-                        </td>
-                        <td style={cellStyle}>{product.product_name}</td>
-                        <td style={cellStyle}>{product.sizee}</td>
-                        <td style={cellStyle}>{product.quantity}</td>
-                        <td style={cellStyle}>৳ {product.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
+  {details.products.map((product, index) => (
+    <tr
+      key={index}
+      style={{
+        ...rowStyle,
+        opacity: product.status === 'cancelled' ? 0.7 : 1
+      }}
+    >
+      <td style={cellStyle}>
+        <img src={product.img} alt="Product" width="50" />
+      </td>
+      <td style={cellStyle}>
+        {product.product_name}
+        {product.status === 'cancelled' && (
+          <div style={{ fontSize: '12px', color: '#b30000', marginTop: '4px' }}>
+            This item was cancelled by the seller due to unforeseen circumstances.
+          </div>
+        )}
+      </td>
+      <td style={cellStyle}>{product.sizee}</td>
+      <td style={cellStyle}>{product.quantity}</td>
+      <td style={cellStyle}>৳ {product.price}</td>
+    </tr>
+  ))}
+</tbody>
+
                 </table>
                 <div style={summaryStyle}>
                   <p><strong>Total Price:</strong>৳ {details.totalPrice}</p>
