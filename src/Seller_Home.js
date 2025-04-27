@@ -236,28 +236,161 @@ export default function Seller_Home() {
                     </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '30px', height: '150px' }}>
-                    <div style={{ flex: 1, padding: '20px', borderRadius: '8px', backgroundColor: '#d4f4dd', textAlign: 'center', color: '#333', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-                        <img src={Comp} style={{ width: '25px' }} />
-                        <h2 style={{ fontSize: '19px', marginBottom: '10px', marginTop: '8px' }}>Completed Orders</h2>
-                        <p style={{ fontSize: '17px', fontWeight: 'bold' }}>{counts.completed} Orders</p>
-                    </div>
-                    <div style={{ flex: 1, padding: '20px', borderRadius: '8px', backgroundColor: '#fff4c4', textAlign: 'center', color: '#333', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-                        <img src={Ship} style={{ width: '30px' }} />
-                        <h2 style={{ fontSize: '19px', marginBottom: '10px', marginTop: '8px' }}>On Shipment</h2>
-                        <p style={{ fontSize: '17px', fontWeight: 'bold' }}>{counts.shipped} Orders</p>
-                    </div>
-                    <div style={{ flex: 1, padding: '20px', borderRadius: '8px', backgroundColor: '#fde4e1', textAlign: 'center', color: '#333', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-                        <img src={Pend} style={{ width: '28px' }} />
-                        <h2 style={{ fontSize: '19px', marginBottom: '10px', marginTop: '8px' }}>Pending Orders</h2>
-                        <p style={{ fontSize: '17px', fontWeight: 'bold' }}>{counts.pending} Orders</p>
-                    </div>
-                </div>
+                <div style={{ 
+    display: 'flex', 
+    gap: '20px', 
+    marginBottom: '40px',
+    justifyContent: 'space-between'
+}}>
+    {/* Completed Orders Card */}
+    <div style={{ 
+        flex: 1,
+        padding: '25px',
+        borderRadius: '12px',
+        background: 'linear-gradient(135deg, #d4f4dd,rgb(188, 251, 228))',
+        color: '#333',
+        boxShadow: '0 6px 15px rgba(0, 100, 0, 0.1)',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        cursor: 'pointer',
+        ':hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: '0 10px 20px rgba(0, 100, 0, 0.15)'
+        }
+    }}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            height: '100%'
+        }}>
+            <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '15px'
+            }}>
+                <img src={Comp} style={{ width: '30px', filter: 'brightness(0.7)' }} />
+            </div>
+            <h3 style={{ 
+                fontSize: '18px', 
+                marginBottom: '12px',
+                fontWeight: '600',
+                color: '#2d7d5a'
+            }}>Completed Orders</h3>
+            <p style={{ 
+                fontSize: '24px',
+                fontWeight: '700',
+                margin: 'auto 0 0 0',
+                color: '#1a3e2c'
+            }}>{counts.completed}</p>
+        </div>
+    </div>
+
+    {/* On Shipment Card */}
+    <div style={{ 
+        flex: 1,
+        padding: '25px',
+        borderRadius: '12px',
+        background: 'linear-gradient(135deg, #fff4c4,rgb(251, 222, 157))',
+        color: '#333',
+        boxShadow: '0 6px 15px rgba(255, 180, 0, 0.1)',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        cursor: 'pointer',
+        ':hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: '0 10px 20px rgba(255, 180, 0, 0.15)'
+        }
+    }}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            height: '100%'
+        }}>
+            <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '15px'
+            }}>
+                <img src={Ship} style={{ width: '30px', filter: 'brightness(0.7)' }} />
+            </div>
+            <h3 style={{ 
+                fontSize: '18px', 
+                marginBottom: '12px',
+                fontWeight: '600',
+                color: '#b38b00'
+            }}>On Shipment</h3>
+            <p style={{ 
+                fontSize: '24px',
+                fontWeight: '700',
+                margin: 'auto 0 0 0',
+                color: '#5c4700'
+            }}>{counts.shipped}</p>
+        </div>
+    </div>
+
+    {/* Pending Orders Card */}
+    <div style={{ 
+        flex: 1,
+        padding: '25px',
+        borderRadius: '12px',
+        background: 'linear-gradient(135deg, #fde4e1,rgb(254, 177, 166))',
+        color: '#333',
+        boxShadow: '0 6px 15px rgba(255, 0, 0, 0.1)',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        cursor: 'pointer',
+        ':hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: '0 10px 20px rgba(255, 0, 0, 0.15)'
+        }
+    }}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            height: '100%'
+        }}>
+            <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '15px'
+            }}>
+                <img src={Pend} style={{ width: '30px', filter: 'brightness(0.7)' }} />
+            </div>
+            <h3 style={{ 
+                fontSize: '18px', 
+                marginBottom: '12px',
+                fontWeight: '600',
+                color: '#c44536'
+            }}>Pending Orders</h3>
+            <p style={{ 
+                fontSize: '24px',
+                fontWeight: '700',
+                margin: 'auto 0 0 0',
+                color: '#7a2c1d'
+            }}>{counts.pending}</p>
+        </div>
+    </div>
+</div>
 
                 <div style={{ marginBottom: '20px' }}>
                     <h3 style={{ fontSize: '21px', marginBottom: '15px', fontWeight: 'bold', textShadow: '0.5px 0.5px 0.5px #000000' }}>
 
-                        Notifications <img src={Notif} style={{ width: '25px' }} /> </h3>
+                        Order Dashboard <img src={Notif} style={{ width: '25px' }} /> </h3>
 
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
@@ -266,7 +399,7 @@ export default function Seller_Home() {
 
                                 <th style={{ border: "1px solid #ddd", padding: "12px", backgroundColor: "#f8f8f8", fontWeight: "bold", textAlign: "left" }}>Date</th>
                                 <th style={{ border: "1px solid #ddd", padding: "12px", backgroundColor: "#f8f8f8", fontWeight: "bold", textAlign: "left" }}>
-                                    Notification Status
+                                    Status
                                     <label style={{fontSize:'12px', fontWeight:'150', fontStyle:'italic', paddingLeft:'10px'}}>[Click to change]</label>
                                     </th>
                                 <th style={{ border: "1px solid #ddd", padding: "12px", backgroundColor: "#f8f8f8", fontWeight: "bold", textAlign: "left" }}>Actions</th>
@@ -297,7 +430,7 @@ export default function Seller_Home() {
                                         </td>
                                         <td style={{ border: "1px solid #ddd", padding: "12px", fontSize: "16px" }}>
                                             <button onClick={() => removeNotification(notif.order_id)} style={{ borderColor: "red", borderWidth: '2px', backgroundColor: 'white', borderRadius: '10px', color: "maroon", padding: "5px 10px", cursor: "pointer" }}>
-                                                Remove Notification
+                                                Remove 
                                             </button>
                                         </td>
                                         {index === 0 && (

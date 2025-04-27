@@ -7,6 +7,7 @@ export default function SellerOrder() {
   const [details, setDetails] = useState(null);
   const [showModal, setShowModal] = useState(false);
   
+  /*
   useEffect(() => {
     
     const sellerName = localStorage.getItem('seller_name');
@@ -20,7 +21,22 @@ export default function SellerOrder() {
           console.error('Error fetching seller orders:', error);
         });
     }
+  }, []); */
+  useEffect(() => {
+    const sellerName = localStorage.getItem('seller_name');
+    if (sellerName) {
+      axios
+        .post('http://localhost:5000/api/sellerOrders', { seller: sellerName })
+        .then((response) => {
+          const sortedOrders = response.data.sort((a, b) => new Date(b.order_time) - new Date(a.order_time));
+          setOrders(sortedOrders);
+        })
+        .catch((error) => {
+          console.error('Error fetching seller orders:', error);
+        });
+    }
   }, []);
+  
 
   const handleViewDetails = (order_id) => {
     const sellerName = localStorage.getItem('seller_name');

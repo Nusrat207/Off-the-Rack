@@ -1,16 +1,14 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './ProductDetails.css';
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import Shop_header from './Shop_header';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './navbar';
 import Footerr from './Footerr';
-import './shopp.css';
-import './nav.css';
 
+// Import your images
 import Bag from './img/bag.png';
 import Cart from './img/cartt.png';
 import Home from './img/homee.png';
@@ -19,15 +17,13 @@ import Order from './img/orderr.png';
 import SignupIcon from './img/regis.png';
 import Review from './img/revieww.png';
 import Write from './img/write.gif';
-
-import Modal from './Modal';
 import User from './img/user.png';
 import Logoo from './img/logo1.jpg';
 import Logout from './img/logout.png';
 import Edit from './img/edit.png';
 import Setting from './img/profile_settings.png';
-import Heart1 from './img/fav.png'
-import Heart2 from './img/notFav.png'
+import Heart1 from './img/fav.png';
+import Heart2 from './img/notFav.png';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -299,16 +295,13 @@ export default function ProductDetails() {
     : Number(availableQuantities) === 0;
 
 
-
-
   return (
-    <div>
+    <div className="product-details-page">
+      {/* Navigation - kept exactly the same */}
       <div className="navbar-container">
         <div className="logo" style={{ paddingRight: '0px' }}>
           <img src={Logoo} style={{ height: '40px' }} alt="settings" />
         </div>
-
-
         <div className="nav-links">
           <Link to="/home">
             <img src={Home} style={{ width: '22px' }} alt="home" /> Home
@@ -344,352 +337,734 @@ export default function ProductDetails() {
             </>
           )}
         </div>
-
         {authToken ? (<></>) : (
-          <Link
-            to="/sellerAcc"
-            style={{
-              color: 'black',
-              textDecoration: 'none',
-              border: '1px solid black',
-              padding: '2px 2px',
-              borderRadius: '3px',
-              transition: 'color 0.2s, textDecoration 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.color = 'blue';
-              e.target.style.textDecoration = 'underline';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.color = 'black';
-              e.target.style.textDecoration = 'none';
-            }}
-          >
+          <Link to="/sellerAcc" className="seller-link">
             Join as Seller
           </Link>
         )}
       </div>
 
-      <div className="product-details-container">
-        <div className="product-header">
-          <h2>{product.product_name}
-            <button
-              style={{ border: 'none', backgroundColor: 'transparent' }}
-              onClick={isFavorite ? () => handleRemoveFromFav(product.id) : handleAddToFav}
-            >
-              <img
-                src={isFavorite ? Heart1 : Heart2}  // Show Heart1 if isFavorite is true, else Heart2
-                style={{ width: '65px', paddingLeft: '30px', paddingBottom: '5px' }}
-                alt="Favorite"
-              />
-            </button>
-
-          </h2>
-
-
-
-        </div>
-        <div className="product-details-content">
-          <div className="product-image">
-            <img src={product.img} alt={product.product_name} />
-          </div>
-          <div className="product-info">
-            <h3>Price: Tk {product.base_price}</h3>
-
-            <p><strong>Subcategory:</strong> {product.subcategory}</p>
-            <p><strong>Color:</strong> {product.color}</p>
-            <p><strong>Brand:</strong> {product.brand}</p>
-            <p><strong>Category:</strong> {product.category}</p>
-            <p><strong>Description:</strong> {product.descrip}</p>
-          </div>
-        </div>
-        <div className="button-group">
-          <button onClick={() => navigate(-1)}>Back to Shop</button>
-          <button
-            onClick={() => setModalVisible(true)}
-            disabled={isSoldOut}
-            style={isSoldOut ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-          >
-            Add to Cart
-          </button>
-
-        </div>
-        {isSoldOut && (
-          <div style={{ paddingTop: '20px', paddingLeft: '190px' }}>
-            <button disabled
-              style={{
-                borderColor: 'red',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                padding: '10px 25px',
-                fontSize: '16px',
-
-                backgroundColor: 'white',
-                color: 'red',
-                fontWeight: 'bold', fontSize: '20px'
-              }}
-            >
-
-              SOLD OUT
-
-            </button>
-          </div>
-        )}
-
-        {/* Review Section */}
-        <div className="review-section">
-          <h5 className="reviews-header" style={{ textShadow: '0.2px 0.2px 0.2pxrgb(177, 166, 166)', fontSize: '18px' }}>
-            <img src={Write} style={{ width: '35px', paddingRight: '5px' }} />
-            Write a Review</h5>
-          <textarea
-            placeholder="Write your review here"
-            value={reviewText}
-            onChange={handleReviewChange}
-          ></textarea>
-          <div className="rating">
-            <span style={{ fontWeight: 'bold' }}>Rate this product: </span>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                className={`star ${rating >= star ? 'filled' : ''}`}
-                onClick={() => handleRatingChange(star)}
-              >
-                ★
-              </span>
-            ))}
-          </div>
-          <button onClick={handleSubmitReview} className="submit-review">
-            Submit
-          </button>
-        </div>
-
-
-        <div className="reviews-section">
-          <h5 className="reviews-header">
-            <img src={Review} alt="Review Icon" className="review-icon" />
-            Reviews
-          </h5>
-          <div style={styles.container}>
-            {ratingData ? (
-              <>
-
-                <div style={styles.ratingRow}>
-                  <div style={styles.avgRating}>
-                    <h1 style={styles.ratingNumber}>{ratingData.avg_stars}/5</h1>
-                    <p style={{ fontSize: '19px', fontWeight: 'bold', paddingTop: '10px' }}>{ratingTotal} Ratings</p>
-                  </div>
-                  <div style={styles.ratingBreakdown}>
-                    <div style={styles.breakdownRow}>
-                      <span style={{ color: '#fdcc0d', fontSize: '20px' }}>★★★★★
-                        <label style={{ fontSize: '20px' }}>
-                        </label></span>
-                      <span style={styles.count}> ({ratingData.star_5_count})</span>
-                    </div>
-                    <div style={styles.breakdownRow}>
-                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★★★★
-                        <label style={{ color: 'gray' }}>☆ </label>
-                      </span>
-                      <span style={styles.count}>({ratingData.star_4_count})</span>
-                    </div>
-                    <div style={styles.breakdownRow}>
-                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★★★
-                        <label style={{ color: 'gray' }}>☆☆ </label>
-
-                      </span>
-                      <span style={styles.count}>({ratingData.star_3_count})</span>
-                    </div>
-                    <div style={styles.breakdownRow}>
-                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★★
-                        <label style={{ color: 'gray' }}>☆☆☆ </label>
-
-                      </span>
-                      <span style={styles.count}>({ratingData.star_2_count})</span>
-                    </div>
-                    <div style={styles.breakdownRow}>
-                      <span style={{ color: '#fdcc0d', fontSize: '20px' }} >★
-                        <label style={{ color: 'gray' }}>☆☆☆☆ </label>
-
-
-                      </span>
-                      <span style={styles.count}>({ratingData.star_1_count})</span>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
-
-
-          {/* REVIEWs SECTION */}
-
-          {reviews.map((review) => (
-            <div className="review" key={review.id}>
-              <h4 className="review-user">{review.userr}</h4>
-              <p className="review-date">{review.datee}</p>
-              <div className="review-rating">
-                <span className="star-rating">{'★'.repeat(Number(review.stars))}</span>
-              </div>
-              <p className="review-comment">{review.comment}</p>
+      {/* Product Details Section */}
+      <div className="product-container">
+        <div className="product-grid">
+          {/* Product Image */}
+          <div className="product-gallery">
+            <div className="main-image">
+              <img src={product.img} alt={product.product_name} />
             </div>
-          ))}
-        </div>
+          </div>
 
+          {/* Product Info */}
+          <div className="product-info">
+            <div className="product-header">
+              <h2 className="product-title">{product.product_name}</h2>
+              <button
+                className="favorite-button"
+                onClick={isFavorite ? () => handleRemoveFromFav(product.id) : handleAddToFav}
+              >
+                <img
+                  src={isFavorite ? Heart1 : Heart2}
+                  alt="Favorite"
+                  className="heart-icon"
+                />
+              </button>
+            </div>
 
+            <div className="price-section">
+              {product.discount > 0 ? (
+                <>
+                  <span className="discounted-price">৳{(product.base_price) -(product.base_price*(product.discount/100)).toFixed(2) } </span>
+                  <span className="original-price">৳{product.base_price}</span>
+                  <span className="discount-badge">{product.discount}% OFF</span>
+                </>
+              ) : (
+                <span className="current-price">৳{product.base_price}</span>
+              )}
+            </div>
 
-        {modalVisible && (
-          <div className="product-details-modal">
-            <div className="product-details-modal-content">
-              <h2>Select Size and Quantity</h2>
-              {isSizeRequired ? (
-                <div className="size-selection">
-                  <label>Size:</label>
-                  <select value={selectedSize} onChange={handleSizeChange}>
-                    <option value="">Select Size</option>
-                    {availableSizes
-                      .filter(item => Number(item.quantity) > 0)  // Filter out sizes with 0 qty
-                      .map((item, index) => (
-                        <option key={index} value={item.size}>
-                          {item.size}
-                        </option>
-                      ))}
-                  </select>
+            <div className="product-meta">
+              <div className="meta-item">
+                <span className="meta-label">Category:</span>
+                <span className="meta-value">{product.category}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Subcategory:</span>
+                <span className="meta-value">{product.subcategory}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Color:</span>
+                <span className="meta-value">{product.color}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Brand:</span>
+                <span className="meta-value">{product.brand}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Seller:</span>
+                <span className="meta-value">{product.seller}</span>
+              </div>
+            </div>
+
+            <div className="product-description">
+              <h3>Description</h3>
+              <p>{product.descrip}</p>
+            </div>
+
+            <div className="product-actions">
+              {isSoldOut ? (
+                <div className="sold-out-badge">
+                  SOLD OUT
                 </div>
               ) : (
-                <div className="no-size-selection">
-                  <p>No size options for this product.</p>
+                <button
+                  className="add-to-cart-btn"
+                  onClick={() => setModalVisible(true)}
+                >
+                  Add to Cart
+                </button>
+              )}
+              <button
+                className="back-to-shop-btn"
+                onClick={() => navigate(-1)}
+              >
+                Back to Shop
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="reviews-container">
+          <div className="reviews-header">
+            <h2>Customer Reviews</h2>
+          </div>
+
+          {/* Rating Summary */}
+          <div className="rating-summary">
+            <div className="rating-overview">
+              <div className="average-rating">
+                <span className="rating-number">{ratingData?.avg_stars || 0}</span>
+                <span className="rating-out-of">/5</span>
+                <div className="stars">
+                  {'★'.repeat(Math.round(ratingData?.avg_stars || 0))}
+                  {'☆'.repeat(5 - Math.round(ratingData?.avg_stars || 0))}
                 </div>
-              )}
-              <div>
-                <label>Quantity:</label>
-                <input
-                  type="number"
-                  min="1"
-                  max={availableQuantities}
-                  value={selectedQuantity}
-                  onChange={handleQuantityChange}
-                />
+                <span className="total-ratings">{ratingTotal} ratings</span>
               </div>
-              <div className="modal-buttons">
-                <button onClick={() => setModalVisible(false)}>Cancel</button>
-                <button onClick={handleAddToCart}
-                  disabled={!quantityValid || selectedQuantity < 1}
-                  style={
-                    !quantityValid ? { opacity: 0.5, cursor: 'not-allowed' } : {}
-                  }
+              <div className="rating-distribution">
+                {[5, 4, 3, 2, 1].map((star) => (
+                  <div className="rating-bar" key={star}>
+                    <span className="star-label">{star} star</span>
+                    <div className="bar-container">
+                      <div
+                        className="bar-fill"
+                        style={{
+                          width: `${(ratingData ? ratingData[`star_${star}_count`] / ratingTotal : 0) * 100}%`
+                        }}
+                      ></div>
+                    </div>
+                    <span className="count">({ratingData ? ratingData[`star_${star}_count`] : 0})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
-                >Add</button>
-              </div> {!quantityValid && (
-                <p style={{ color: 'red', marginTop: '5px', fontSize: '14px' }}>
-                  Only {availableQuantities} item(s) in stock for the selected size.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-        {isLoginPromptVisible && (
-          <div className="login-prompt-modal">
-            <div className="login-prompt-modal-content">
-              <h2>Please Log in to Add Items to Cart!</h2>
-              <div className="modal-buttons">
-                <button onClick={() => setLoginPromptVisible(false)}>Close</button>
-                <button onClick={handleLoginRedirect}>Log in</button>
+          {/* Write Review */}
+          <div className="write-review">
+            <h3>
+              <img src={Write} alt="Write review" className="write-icon" />
+              Write a Review
+            </h3>
+            <textarea
+              placeholder="Share your thoughts about this product..."
+              value={reviewText}
+              onChange={handleReviewChange}
+            ></textarea>
+            <div className="rating-input">
+              <span>Your Rating:</span>
+              <div className="star-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`star ${rating >= star ? 'filled' : ''}`}
+                    onClick={() => handleRatingChange(star)}
+                  >
+                    ★
+                  </span>
+                ))}
               </div>
             </div>
+            <button
+              className="submit-review-btn"
+              onClick={handleSubmitReview}
+            >
+              Submit Review
+            </button>
           </div>
-        )}
+
+          {/* Reviews List */}
+       {/* Reviews List */}
+<div className="reviews-list">
+  {reviews.map((review) => (
+    <div className="review-card" key={review.id}>
+      <div className="review-header">
+        <span className="reviewer-name">{review.userr}</span>
+        <span className="review-date">{review.datee}</span>
       </div>
+      {review.verified && <div className="verified-badge">✔ Verified</div>}
+      <div className="review-rating">
+        {'★'.repeat(Number(review.stars))}
+        {'☆'.repeat(5 - Number(review.stars))}
+      </div>
+      <p className="review-text">{review.comment}</p>
 
+      {review.reply && review.reply.trim() !== '' && (
+  <div className="review-reply">
+    <strong>Reply:</strong>
+    <p>{review.reply}</p>
+  </div>
+)}
 
     </div>
-  );
+  ))}
+</div>
+
+        </div>
+      </div>
+
+      {/* Modals - kept exactly the same */}
+      {modalVisible && (
+        <div className="product-details-modal">
+          <div className="product-details-modal-content">
+            <h2>Select Size and Quantity</h2>
+            {isSizeRequired ? (
+              <div className="size-selection">
+                <label>Size:</label>
+                <select value={selectedSize} onChange={handleSizeChange}>
+                  <option value="">Select Size</option>
+                  {availableSizes
+                    .filter(item => Number(item.quantity) > 0)  // Filter out sizes with 0 qty
+                    .map((item, index) => (
+                      <option key={index} value={item.size}>
+                        {item.size}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            ) : (
+              <div className="no-size-selection">
+                <p>No size options for this product.</p>
+              </div>
+            )}
+            <div>
+              <label>Quantity:</label>
+              <input
+                type="number"
+                min="1"
+                max={availableQuantities}
+                value={selectedQuantity}
+                onChange={handleQuantityChange}
+              />
+            </div>
+            <div className="modal-buttons">
+              <button onClick={() => setModalVisible(false)}>Cancel</button>
+              <button onClick={handleAddToCart}
+                disabled={!quantityValid || selectedQuantity < 1}
+                style={
+                  !quantityValid ? { opacity: 0.5, cursor: 'not-allowed' } : {}
+                }
+
+              >Add</button>
+            </div> {!quantityValid && (
+              <p style={{ color: 'red', marginTop: '5px', fontSize: '14px' }}>
+                Only {availableQuantities} item(s) in stock for the selected size.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+      {isLoginPromptVisible && (
+        <div className="login-prompt-modal">
+          <div className="login-prompt-modal-content">
+            <h2>Please Log in to Add Items to Cart!</h2>
+            <div className="modal-buttons">
+              <button onClick={() => setLoginPromptVisible(false)}>Close</button>
+              <button onClick={handleLoginRedirect}>Log in</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CSS Styles */}
+      <style jsx>{`
+        .product-details-page {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          color: #333;
+          max-width: 100%;
+          margin: 0 auto;
+      
+          
+          
+        }
+
+        /* Navigation - kept your styles but made responsive */
+        .navbar-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 0;
+          border-bottom: 1px solid #eee;
+          margin-bottom: 30px;
+  
+        }
+
+        .nav-links {
+          display: flex;
+          gap: 20px;
+          align-items: center;
+        }
+
+        .nav-links a {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          text-decoration: none;
+          color: #333;
+          font-weight: 500;
+        }
+
+        .seller-link {
+          color: black;
+          text-decoration: none;
+          border: 1px solid black;
+          padding: 5px 10px;
+          border-radius: 3px;
+          transition: all 0.2s;
+        }
+
+        .seller-link:hover {
+          color: blue;
+          text-decoration: underline;
+        }
+
+        /* Product Container */
+        .product-container {
+          margin-top: 30px;
+          max-width: 90%;
+          padding-left: 100px;
+        }
+
+        .product-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
+        }
+
+        /* Product Gallery */
+        .product-gallery {
+          position: relative;
+        }
+
+        .main-image {
+          border: 1px solid #eee;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #f9f9f9;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 500px;
+        }
+
+        .main-image img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+        }
+
+        /* Product Info */
+        .product-info {
+          padding: 20px;
+        }
+
+        .product-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .product-title {
+          font-size: 28px;
+          font-weight: 600;
+          margin: 0;
+          color: #222;
+        }
+
+        .favorite-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 5px;
+        }
+
+        .heart-icon {
+          width: 30px;
+          height: 30px;
+        }
+
+        .price-section {
+  margin: 25px 0;
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.current-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e63946;
+}
+
+.discounted-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e63946;
+}
+
+.original-price {
+  font-size: 18px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  background-color: #e63946;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+        .product-meta {
+          margin: 20px 0;
+        }
+
+        .meta-item {
+          display: flex;
+          margin-bottom: 10px;
+        }
+
+        .meta-label {
+          font-weight: 600;
+          min-width: 120px;
+          color: #666;
+        }
+
+        .meta-value {
+          color: #333;
+        }
+
+        .product-description {
+          margin: 30px 0;
+        }
+
+        .product-description h3 {
+          font-size: 18px;
+          margin-bottom: 10px;
+          color: #444;
+        }
+
+        .product-description p {
+          line-height: 1.6;
+          color: #555;
+        }
+
+        /* Product Actions */
+        .product-actions {
+          display: flex;
+          gap: 15px;
+          margin-top: 30px;
+        }
+
+        .add-to-cart-btn, .back-to-shop-btn {
+          padding: 12px 25px;
+          border-radius: 4px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .add-to-cart-btn {
+          background-color: #660640;
+          color: white;
+          border: none;
+        }
+
+        .add-to-cart-btn:hover {
+          background-color: #4d0530;
+        }
+
+        .back-to-shop-btn {
+          background-color: white;
+          color: #660640;
+          border: 1px solid #660640;
+        }
+
+        .back-to-shop-btn:hover {
+          background-color: #f9f0f5;
+        }
+
+        .sold-out-badge {
+          padding: 12px 25px;
+          background-color: #f8f9fa;
+          color: #d14343;
+          border: 2px solid #d14343;
+          border-radius: 4px;
+          font-weight: 600;
+          font-size: 16px;
+        }
+
+        /* Reviews Section */
+        .reviews-container {
+          margin-top: 60px;
+          border-top: 1px solid #eee;
+          padding-top: 40px;
+        }
+
+        .reviews-header h2 {
+          font-size: 24px;
+          margin-bottom: 30px;
+          color: #333;
+        }
+
+        /* Rating Summary */
+        .rating-summary {
+          background: #f9f9f9;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 30px;
+        }
+
+        .rating-overview {
+          display: flex;
+          gap: 50px;
+        }
+
+        .average-rating {
+          text-align: center;
+          min-width: 150px;
+        }
+
+        .rating-number {
+          font-size: 42px;
+          font-weight: 700;
+          color: #333;
+        }
+
+        .rating-out-of {
+          font-size: 24px;
+          color: #777;
+        }
+
+        .stars {
+          font-size: 24px;
+          color: #ffc107;
+          margin: 5px 0;
+        }
+
+        .total-ratings {
+          color: #777;
+          font-size: 14px;
+        }
+
+        .rating-distribution {
+          flex: 1;
+        }
+
+        .rating-bar {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        .star-label {
+          min-width: 70px;
+          font-size: 14px;
+          color: #555;
+        }
+
+        .bar-container {
+          flex: 1;
+          height: 10px;
+          background: #e0e0e0;
+          border-radius: 5px;
+          margin: 0 10px;
+          overflow: hidden;
+        }
+
+        .bar-fill {
+          height: 100%;
+          background: #ffc107;
+        }
+
+        .count {
+          min-width: 50px;
+          text-align: right;
+          font-size: 14px;
+          color: #777;
+        }
+
+        /* Write Review */
+        .write-review {
+          background: white;
+          border-radius: 8px;
+          padding: 25px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+          margin-bottom: 30px;
+        }
+
+        .write-review h3 {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 20px;
+          margin-bottom: 20px;
+          color: #333;
+        }
+
+        .write-icon {
+          width: 25px;
+        }
+
+        .write-review textarea {
+          width: 100%;
+          min-height: 120px;
+          padding: 15px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-family: inherit;
+          font-size: 14px;
+          margin-bottom: 20px;
+          resize: vertical;
+        }
+
+        .rating-input {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+
+        .star-rating {
+          font-size: 24px;
+        }
+
+        .star-rating .star {
+          color: #ddd;
+          cursor: pointer;
+          transition: color 0.2s;
+        }
+
+        .star-rating .filled {
+          color: #ffc107;
+        }
+
+        .submit-review-btn {
+          background-color: #660640;
+          color: white;
+          border: none;
+          padding: 12px 25px;
+          border-radius: 4px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+
+        .submit-review-btn:hover {
+          background-color: #4d0530;
+        }
+
+       .reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.review-card {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.review-date {
+  color: #777;
+  font-size: 14px;
+}
+
+.verified-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #e0f7e9;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.review-rating {
+  color: #ffc107;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.review-text {
+  line-height: 1.6;
+  color: #555;
+}
+
+.review-reply {
+  margin-top: 15px;
+  padding: 12px 16px;
+  background: #f9f9f9;
+  border-left: 4px solid #2196f3;
+  border-radius: 4px;
+  color: #333;
 }
 
 
-const styles = {
-  container: {
-    width: "50%",
-    margin: "0 auto",
-    textAlign: "center",
-    fontFamily: "Arial, sans-serif",
-
-  },
-  heading: {
-    fontSize: "24px",
-    marginBottom: "20px",
-  },
-  ratingRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  avgRating: {
-    flex: 1,
-    textAlign: "center",
-  },
-  ratingNumber: {
-    fontSize: "36px",
-    margin: "0",
-    color: "#f5a623",
-  },
-  ratingBreakdown: {
-    flex: 1,
-    textAlign: "left",
-    marginLeft: "20px",
-  },
-  breakdownRow: {
-    display: "flex",
-
-    marginBottom: "10px",
-  },
-  count: {
-    fontWeight: "500",
-    fontSize: '17px',
-    paddingTop: '3px',
-    paddingLeft: '20px'
-
-  },
-};
-/*
-  
-{/* ratings 
-<div style={styles.container}>
-      {ratingData ? (
-        <>
-          <h2 style={styles.heading}>Product Rating</h2>
-          <div style={styles.ratingRow}>
-            <div style={styles.avgRating}>
-              <h1 style={styles.ratingNumber}>{ratingData.avg_stars}/5</h1>
-              <p>{ratingData.total_ratings} Ratings</p>
-            </div>
-            <div style={styles.ratingBreakdown}>
-              <div style={styles.breakdownRow}>
-                <span>5 Stars</span>
-                <span style={styles.count}>{ratingData.star_5_count}</span>
-              </div>
-              <div style={styles.breakdownRow}>
-                <span>4 Stars</span>
-                <span style={styles.count}>{ratingData.star_4_count}</span>
-              </div>
-              <div style={styles.breakdownRow}>
-                <span>3 Stars</span>
-                <span style={styles.count}>{ratingData.star_3_count}</span>
-              </div>
-              <div style={styles.breakdownRow}>
-                <span>2 Stars</span>
-                <span style={styles.count}>{ratingData.star_2_count}</span>
-              </div>
-              <div style={styles.breakdownRow}>
-                <span>1 Star</span>
-                <span style={styles.count}>{ratingData.star_1_count}</span>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <p>Loading...</p>
-      )}
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .product-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .rating-overview {
+            flex-direction: column;
+            gap: 20px;
+          }
+        }
+      `}</style>
     </div>
-
-    */
+  );
+}

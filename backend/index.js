@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 const pool = new Pool({
   host: 'localhost',
   user: 'postgres',
-  password: 'Ummnny947',
+  password: 'abcd12',
   port: '5432',
   database: 'ecom1'
 });
@@ -1314,7 +1314,7 @@ app.get('/api/reviewsSeller', async (req, res) => {
   try {
     // Get all products and reviews for the seller
     const resultt = await pool.query(`
-      SELECT p.id as product_id, p.product_name as product_name, 
+      SELECT p.id as product_id, p.product_name as product_name, p.img as image, 
              r.review_id, r.userr, r.comment, r.stars, r.datee, r.reply, r.verified
       FROM products p
       LEFT JOIN review r ON p.id = cast(r.product_id as integer)
@@ -1325,7 +1325,7 @@ app.get('/api/reviewsSeller', async (req, res) => {
 
     // Use for...of loop to handle async operations inside
     for (const row of resultt.rows) {
-      const { product_id, product_name, description, ...review } = row;
+      const { product_id, product_name, image, description, ...review } = row;
 
       try {
         // Wait for the query to finish before continuing
@@ -1336,6 +1336,7 @@ app.get('/api/reviewsSeller', async (req, res) => {
         if (!products[product_id]) {
           products[product_id] = {
             name: product_name,
+            image: image,
             description: description,
             reviews: [],
             average_rating: ratingsData.avg_stars || 0,
@@ -1460,7 +1461,7 @@ app.post('/api/cancel-product', async (req, res) => {
 });
 
 // Endpoint to get products with discount > 5%
-app.get('/api/discounted-products', async (req, res) => {
+app.get('/api/discounted-productsx', async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT p.*, 
@@ -1473,6 +1474,38 @@ app.get('/api/discounted-products', async (req, res) => {
        LIMIT 10`
     );
     res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/discounted-products', async (req, res) => {
+  try {
+    // Get products with discount > 5
+    const productsResult = await pool.query(
+      `SELECT * FROM products
+       WHERE discount > 5
+       ORDER BY discount DESC
+       LIMIT 10`
+    );
+    
+    const productIds = productsResult.rows.map(product => product.id);
+    
+    const productSizeResult = await pool.query(
+      `SELECT * FROM product_size 
+       WHERE product_id = ANY($1)`,
+      [productIds]
+    );
+
+    const data = {
+      products: productsResult.rows,
+      product_size_qty: productSizeResult.rows,
+    };
+
+    //console.log(data);
+    
+    res.status(200).json(data);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
