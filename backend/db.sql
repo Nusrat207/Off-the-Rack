@@ -106,7 +106,7 @@ create table delivery_info(
 );
 
 create table order_notif(
-    order_id text unique,
+    order_id text,
     seller text,
     order_time text,
     status text 
