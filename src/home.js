@@ -286,7 +286,7 @@ export default function Home() {
                     max-width: 1200px;
                     margin: 0 auto;
                     position: relative;
-                    z-index: 2;
+                    
                 }
                 
                 .welcome-text {
