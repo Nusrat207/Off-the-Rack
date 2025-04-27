@@ -391,9 +391,23 @@ export default function Additem() {
 
 
                             <div className="addform_group">
-                                <label className="addsub_title" htmlFor="desc">Description</label>
-                                <input placeholder="product description or any specification you want to mention" className="addform_style" type="text" id="descrip" value={formData.descrip}
-                                    onChange={handleChange} />
+                                <label className="addsub_title" htmlFor="descrip">Description</label>
+                                <textarea
+                                    placeholder="product description or any specification you want to mention"
+                                    className="addform_style"
+                                    id="descrip"
+                                    value={formData.descrip}
+                                    maxLength={250}
+                                    onChange={(e) => {
+                                        if (e.target.value.length <= 250) {
+                                            setFormData({ ...formData, descrip: e.target.value });
+                                        }
+                                    }}
+                                    rows={3}
+                                />
+                                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                                    {formData.descrip.length}/250
+                                </div>
                             </div>
                             {/*     <div className="addform_group">
                                 <label className="addsub_title" htmlFor="img">Image URL</label>

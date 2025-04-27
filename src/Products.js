@@ -279,7 +279,6 @@ const Products = () => {
                       <th>Image</th>
                       <th>Product</th>
                       <th>Price</th>
-                      <th>Description</th>
                       <th>Color</th>
                       <th>Brand</th>
                       <th>Discount</th>
@@ -299,7 +298,6 @@ const Products = () => {
                         </td>
                         <td>{product.product_name}</td>
                         <td>৳{product.base_price}</td>
-                        <td className="description-cell">{product.descrip}</td>
                         <td>
                           <span className="color-badge" style={{ backgroundColor: product.color.toLowerCase() }}></span>
                           {product.color}
@@ -354,28 +352,31 @@ const Products = () => {
             <p>
               <strong>Price:</strong> {viewDetailsProduct.base_price}
             </p>
-            <p>
-              <strong>Color:</strong> {viewDetailsProduct.color}
-            </p>
-            <p>
-              <strong>Sizes and Stock:</strong>
-            </p>
-            <table className="size-stock-table">
-              <thead>
-                <tr>
-                  <th>Size</th>
-                  <th>Stock</th>
-                </tr>
-              </thead>
-              <tbody>
-                {viewDetailsProduct.sizes.map((sizeObj, index) => (
-                  <tr key={index}>
-                    <td>{sizeObj.size}</td>
-                    <td>{sizeObj.stock}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <p>
+          <strong>Color:</strong> {viewDetailsProduct.color}
+        </p>
+        <p>
+          <strong>Description:</strong> {viewDetailsProduct.descrip}
+        </p>
+        <p>
+          <strong>Sizes and Stock:</strong>
+        </p>
+        <table className="size-stock-table">
+          <thead>
+            <tr>
+              <th>Size</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            {viewDetailsProduct.sizes.map((sizeObj, index) => (
+              <tr key={index}>
+                <td>{sizeObj.size}</td>
+                <td>{sizeObj.stock}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
             <div className="update-product-info" style={{ paddingTop: '15px' }}>
 
