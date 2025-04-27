@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 const pool = new Pool({
   host: 'localhost',
   user: 'postgres',
-  password: 'abcd12',
+  password: 'Ummnny947',
   port: '5432',
   database: 'ecom1'
 });
@@ -1456,5 +1456,25 @@ app.post('/api/cancel-product', async (req, res) => {
   } catch (err) {
     console.error('Error cancelling product:', err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to get products with discount > 5%
+app.get('/api/discounted-products', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT p.*, 
+       json_agg(json_build_object('size', ps.sizee, 'quantity', ps.quantity)) AS sizes
+       FROM products p
+       LEFT JOIN product_size ps ON p.id::TEXT = ps.product_id
+       WHERE p.discount > 5
+       GROUP BY p.id
+       ORDER BY p.discount DESC
+       LIMIT 10`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
