@@ -1,9 +1,11 @@
+
 import { Link, useNavigate } from 'react-router-dom'
 import React, { useState, useEffect } from "react";
 import "./Products.css";
 import redTeeImage from "./img/red-tee.jpg";
 import axios from "axios";
 import Seller_Menu from "./Seller_nav_side";
+
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
@@ -46,9 +48,7 @@ const Products = () => {
     const fetchProducts = async () => {
       if (selectedCategory && selectedSubCategory) {
         try {
-          /* const response = await axios.get(
-             `/seller_products?category=${selectedCategory}&subcategory=${selectedSubCategory}`
-           ); */
+
           const shop_name = localStorage.getItem('seller_name');
           const response = await axios.get('http://localhost:5000/seller_products', {
             params: {
@@ -98,13 +98,13 @@ const Products = () => {
   const handleDiscountChange = (e) => {
     setUpdatedDiscount(e.target.value);
     const newDiscount = e.target.value;
-  if (newDiscount === "" || newDiscount === undefined || newDiscount ===0) {
-    setUpdatedDiscount(viewDetailsProduct.discount); 
-  } else {
-    setUpdatedDiscount(e.target.value);
-  }
+    if (newDiscount === "" || newDiscount === undefined || newDiscount === 0) {
+      setUpdatedDiscount(viewDetailsProduct.discount);
+    } else {
+      setUpdatedDiscount(e.target.value);
+    }
   };
-  
+
 
   const updateStock = (size, newStock) => {
     if (viewDetailsProduct) {
@@ -135,7 +135,7 @@ const Products = () => {
 
   let navigate = useNavigate();
 
-  const [updatedStock, setUpdatedStock] = useState({}); 
+  const [updatedStock, setUpdatedStock] = useState({});
 
   // Handle the change for stock updates
   const handleStockChange = (size, value) => {
@@ -144,7 +144,7 @@ const Products = () => {
       [size]: value // Save the updated stock value for each size
     }));
   };
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,7 +152,7 @@ const Products = () => {
     const sellerName = localStorage.getItem("seller_name");
 
     const productId = viewDetailsProduct.id;
-   
+
     if (isAddNewSizeSelected) {
       const dataToSend = newSizes.map(sizeData => ({
         seller: sellerName,
@@ -161,8 +161,8 @@ const Products = () => {
         sizee: sizeData.size,
         quantity: sizeData.qty
       }));
-      if (updatedDiscount === "" || updatedDiscount=== undefined || updatedDiscount===0) {
-        setUpdatedDiscount(viewDetailsProduct.discount); 
+      if (updatedDiscount === "" || updatedDiscount === undefined || updatedDiscount === 0) {
+        setUpdatedDiscount(viewDetailsProduct.discount);
       }
       try {
         const response = await axios.post('http://localhost:5000/add-sizes', {
@@ -180,10 +180,10 @@ const Products = () => {
         console.error('Error adding sizes:', error);
         alert('Error adding sizes');
       }
-    } 
+    }
     else if (isUpdateStockSelected) {
       const dataToSend = viewDetailsProduct.sizes.map(sizeObj => {
-        
+
         const updatedQty = updatedStock[sizeObj.size];
         if (updatedQty && updatedQty !== sizeObj.stock) {
           return {
@@ -196,15 +196,15 @@ const Products = () => {
         }
         return null;
       }).filter(item => item !== null);
-      if (updatedDiscount === "" || updatedDiscount === undefined || updatedDiscount ===0) {
-        setUpdatedDiscount(viewDetailsProduct.discount); 
+      if (updatedDiscount === "" || updatedDiscount === undefined || updatedDiscount === 0) {
+        setUpdatedDiscount(viewDetailsProduct.discount);
       }
       try {
         const response = await axios.post('http://localhost:5000/update-stock', {
           sizes: dataToSend,
           discount: updatedDiscount
         });
-    
+
         console.log('Successfully updated stock:', response.data);
 
         closeDetailsModal();
@@ -214,15 +214,15 @@ const Products = () => {
         console.error('Error updating stock:', error);
         alert('Error updating stock');
       }
-    } 
-    else{
-  
+    }
+    else {
+
       try {
         const response = await axios.post('http://localhost:5000/updateDiscount', {
           discount: updatedDiscount,
           product_id: productId
         });
-    
+
         console.log('Successfully updated discount', response.data);
 
         closeDetailsModal();
@@ -235,105 +235,120 @@ const Products = () => {
     }
   };
 
+
   return (
-    <div> <Seller_Menu />
+    <div className="seller-products-page">
+      <Seller_Menu />
       <div className="products-container">
-        <div className="category-tabs">
+        {/* Category Tabs */}
+        <div className="category-tabs-container">
           {Object.keys(categories).map((category) => (
-            <div
+            <button
               key={category}
-              className={`category-tab ${selectedCategory === category ? "active-tab" : ""
-                }`}
+              className={`category-tab ${selectedCategory === category ? "active-tab" : ""}`}
               onClick={() => handleCategoryClick(category)}
             >
               {category}
-            </div>
+            </button>
           ))}
         </div>
 
+        {/* Subcategory Menu */}
         {selectedCategory && (
-          <div className="subcategory-menu">
+          <div className="subcategory-menu-container">
             {categories[selectedCategory].map((subCategory) => (
-              <span
+              <button
                 key={subCategory}
-                className={`subcategory ${selectedSubCategory === subCategory ? "active-sub" : ""
-                  }`}
+                className={`subcategory-tab ${selectedSubCategory === subCategory ? "active-sub" : ""}`}
                 onClick={() => handleSubCategoryClick(subCategory)}
               >
                 {subCategory}
-              </span>
+              </button>
             ))}
           </div>
         )}
 
-        <div className="product-table">
-          {selectedSubCategory ? ( // Check if a subcategory is selected
+        {/* Product Table */}
+        <div className="product-table-container">
+          {selectedSubCategory ? (
             products.length > 0 ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Image</th>
-                    <th>Product</th>
-                    <th>Price</th>
-                    {/*      <th>Seller</th> */}
-                    {/*      <th>Code</th> */}
-                    <th>Description</th>
-                    <th>Color</th>
-                    <th>Brand</th>
-                    <th>Discount</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <img
-                          src={product.img}
-                          alt={product.product_name}
-                          className="product-image"
-                          onClick={() => setImageModal(product.img)}
-                        />
-                      </td>
-                      <td>{product.product_name}</td>
-                      <td>{product.base_price}</td>
-                      {/*    <td>{product.seller}</td> */}
-                      {/*   <td>{product.code}</td> */}
-                      <td>{product.descrip}</td>
-                      <td>{product.color}</td>
-                      <td>{product.brand}</td>
-                      <td>{product.discount}%</td>
-                      <td>
-                        <button
-                          className="view-details"
-                          onClick={() => handleViewDetails(product)}
-                        >
-                          View Details
-                        </button>
-                      </td>
+              <div className="responsive-table">
+                <table className="products-table">
+                  <thead>
+                    <tr>
+                      <th>Image</th>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Description</th>
+                      <th>Color</th>
+                      <th>Brand</th>
+                      <th>Discount</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {products.map((product) => (
+                      <tr key={product.id}>
+                        <td>
+                          <img
+                            src={product.img}
+                            alt={product.product_name}
+                            className="product-image"
+                            onClick={() => setImageModal(product.img)}
+                          />
+                        </td>
+                        <td>{product.product_name}</td>
+                        <td>৳{product.base_price}</td>
+                        <td className="description-cell">{product.descrip}</td>
+                        <td>
+                          <span className="color-badge" style={{ backgroundColor: product.color.toLowerCase() }}></span>
+                          {product.color}
+                        </td>
+                        <td>{product.brand}</td>
+                        <td>
+                          <span className={`discount-badge ${product.discount > 0 ? 'active' : ''}`}>
+                            {product.discount}%
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            className="view-details-btn"
+                            onClick={() => handleViewDetails(product)}
+                          >
+                            Manage
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
-              <p>No products available for this subcategory.</p>
+              <div className="empty-state">
+                <p>No products available for this subcategory.</p>
+                <button className="add-product-btn"> <Link to='/addItem' style={{ textDecoration: 'none', color: 'white' }}>+ Add New Product</Link></button>
+              </div>
             )
           ) : (
-            <p>Select the subcategory you want to check.</p>
+            <div className="select-prompt">
+              <p>Please select a subcategory to view products</p>
+            </div>
           )}
         </div>
 
+        {/* Product Details Modal */}
         {viewDetailsProduct && (
 
           <div className="seller-product-details-modal" style={{ overflowY: "scroll", maxHeight: "80vh" }}>
             <h4> {viewDetailsProduct.product_name}
-           <span style={{paddingLeft:'376px'}}> 
-            
-            <button style={{ float: 'right', background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer',
+              <span style={{ paddingLeft: '376px' }}>
 
-            }} className="seller-close-modal" onClick={closeDetailsModal}>
-              X
-            </button></span>
+                <button style={{
+                  float: 'right', background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer',
+
+                }} className="seller-close-modal" onClick={closeDetailsModal}>
+                  X
+                </button></span>
 
             </h4>
             <p>
@@ -379,7 +394,7 @@ const Products = () => {
                   max="100"
                   defaultValue={viewDetailsProduct.discount}
                   style={{ padding: "5px", width: "150px" }}
-                   onChange={handleDiscountChange}
+                  onChange={handleDiscountChange}
                 />
               </div>
 
@@ -476,7 +491,7 @@ const Products = () => {
                             defaultValue={sizeObj.stock}
                             placeholder="New Qty"
                             style={{ padding: "5px", width: "100px", marginLeft: "10px" }}
-                            onChange={(e) => handleStockChange(sizeObj.size, e.target.value)} 
+                            onChange={(e) => handleStockChange(sizeObj.size, e.target.value)}
                           />
                         </label>
                       </div>
@@ -490,23 +505,274 @@ const Products = () => {
 
             <button className="close-modal" onClick={handleSubmit}>Save</button>
 
-          
+
           </div>
         )}
 
-
-
+        {/* Image Modal */}
         {imageModal && (
-          <div className="image-modal">
-            <img src={imageModal} alt="Product" className="large-image" />
-            <button className="close-image-modal" onClick={closeImageModal}>
-              Close
-            </button>
+          <div className="image-preview-modal">
+            <div className="image-modal-content">
+              <img src={imageModal} alt="Product Preview" />
+              <button className="close-image-modal" onClick={closeImageModal}>
+                x
+              </button>
+            </div>
           </div>
         )}
-      </div> </div>
+      </div>
+
+      {/* CSS Styles */}
+      <style jsx>{`
+        .seller-products-page {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f8f9fa;
+          min-height: 100vh;
+        }
+
+        .products-container {
+          max-width: 100%;
+          margin-top:90px;
+          padding: 20px;
+        }
+
+        /* Category Tabs */
+        .category-tabs-container {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        .category-tab {
+          padding: 10px 20px;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 500;
+          color:black;
+        }
+
+        .category-tab:hover {
+          background-color: #f0f0f0;
+        }
+
+        .category-tab.active-tab {
+          background-color: #660640;
+          color: white;
+          border-color: #660640;
+        }
+
+        /* Subcategory Menu */
+        .subcategory-menu-container {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        .subcategory-tab {
+          padding: 8px 16px;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          border-radius: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-size: 14px;
+        }
+
+        .subcategory-tab:hover {
+          background-color: #f0f0f0;
+        }
+
+        .subcategory-tab.active-sub {
+          background-color: #8e44ad;
+          color: white;
+          border-color: #8e44ad;
+        }
+
+        /* Product Table */
+        .product-table-container {
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+          overflow: hidden;
+        }
+
+        .responsive-table {
+          overflow-x: auto;
+        }
+
+        .products-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .products-table th {
+          background-color: #f5f5f7;
+          padding: 12px 15px;
+          text-align: left;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .products-table td {
+          padding: 12px 15px;
+          border-bottom: 1px solid #eee;
+          vertical-align: middle;
+        }
+
+        .product-image {
+          width: 60px;
+          height: 60px;
+          object-fit: cover;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: transform 0.3s ease;
+        }
+
+        .product-image:hover {
+          transform: scale(1.1);
+        }
+
+        .description-cell {
+          max-width: 200px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .color-badge {
+          display: inline-block;
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          margin-right: 8px;
+          vertical-align: middle;
+        }
+
+        .discount-badge {
+          display: inline-block;
+          padding: 3px 8px;
+          background-color: #f0f0f0;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .discount-badge.active {
+          background-color: #d4edda;
+          color: #155724;
+        }
+
+        .view-details-btn {
+          background-color: #660640;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background-color 0.3s;
+        }
+
+        .view-details-btn:hover {
+          background-color: #4d0530;
+        }
+
+        /* Empty State */
+        .empty-state {
+          padding: 40px;
+          text-align: center;
+        }
+
+        .empty-state p {
+          color: #666;
+          margin-bottom: 20px;
+        }
+
+        .add-product-btn {
+          background-color: #660640;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+        }
+
+        /* Select Prompt */
+        .select-prompt {
+          padding: 40px;
+          text-align: center;
+          color: #666;
+        }
+
+       
+
+        /* Image Modal */
+        .image-preview-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0,0,0,0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1001;
+        }
+
+        .image-modal-content {
+          position: relative;
+          max-width: 90%;
+          max-height: 90%;
+        }
+
+        .image-modal-content img {
+          max-width: 100%;
+          max-height: 80vh;
+          object-fit: contain;
+        }
+
+        .close-image-modal {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background-color: rgba(0,0,0,0.7);
+          color: white;
+          border: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          font-size: 18px;
+          cursor: pointer;
+          display: flex;
+  align-items: center;
+  justify-content: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .product-info-section {
+            flex-direction: column;
+          }
+          
+          .radio-group {
+            flex-direction: column;
+            gap: 10px;
+          }
+          
+          .modal-actions {
+            justify-content: center;
+          }
+        }
+      `}</style>
+    </div>
   );
 };
 
 export default Products;
-

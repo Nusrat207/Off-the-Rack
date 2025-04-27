@@ -152,6 +152,7 @@ export default function Additem() {
 
 
     const navigate = useNavigate();
+    /*
     const handleAdd = async (e) => {
         e.preventDefault();
 
@@ -185,7 +186,71 @@ export default function Additem() {
             console.error('There was an error adding the product!', error);
             alert('Failed to add product. Please try again.');
         }
+    }; */
+    const handleAdd = async (e) => {
+        e.preventDefault();
+    
+        const seller_email = localStorage.getItem('seller_mail');
+        const img = localStorage.getItem('imgURL');
+    
+        const requiredFields = [
+            formData.product_name,
+            formData.category,
+            formData.subcategory,
+            formData.price,
+            formData.discount,
+            formData.descrip,
+            formData.color,
+            formData.sizee,
+            formData.quantity,
+            formData.brand,
+            seller_email,
+            img
+        ];
+    
+        // Additional check for bags or jewellery
+        if ((formData.category === 'bags' || formData.category === 'jewellery') && !bagJewelryQuantity) {
+            alert("Please enter the quantity for Bags or Jewellery.");
+            return;
+        }
+    
+        // Check if any field is empty
+        const isEmpty = requiredFields.some(field => field === undefined || field === null || field === '');
+    
+        if (isEmpty) {
+            alert("All fields are required. Please fill in every input.");
+            return;
+        }
+    
+        const productData = {
+            product_name: formData.product_name,
+            category: formData.category,
+            subcategory: formData.subcategory,
+            base_price: formData.price,
+            img: img,
+            seller: seller_email,
+            discount: formData.discount,
+            descrip: formData.descrip,
+            color: formData.color,
+            sizee: formData.sizee,
+            quantity: formData.quantity,
+            brand: formData.brand,
+            bagJewelryQuantity: (formData.category === 'bags' || formData.category === 'jewellery') ? bagJewelryQuantity : undefined
+        };
+    
+        try {
+            const response = await axios.post('http://localhost:5000/addproductz', productData);
+    
+            if (response.status === 200) {
+                alert('Product and sizes added successfully!');
+                navigate('/Products');
+            }
+        } catch (error) {
+            console.error('There was an error adding the product!', error);
+            alert('Failed to add product. Please try again.');
+        }
     };
+    
 
 
     return (
@@ -338,7 +403,7 @@ export default function Additem() {
                             </div> */}
 
                             <div className="addform_group">
-                                <label className="addsub_title">Image</label>
+                                <label className="addsub_title">Image</label> <label style={{fontSize:'10px'}}>Choose img then click on upload</label>
                                 <input type="file" onChange={handleImageChange} />
                                 <div style={{ paddingTop: '8px' }}>
                                     <button style={{ fontSize: '14px', fontWeight: 'bold', border: '2px solid black', padding: '2px 2px' }} onClick={handleUpload}>Upload</button>
