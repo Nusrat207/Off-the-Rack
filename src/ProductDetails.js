@@ -33,6 +33,8 @@ export default function ProductDetails() {
 
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     const fetchProductDetails = async () => {
       try {
         const response = await fetch(`/api/products/${id}`);
